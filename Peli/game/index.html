@@ -4,28 +4,41 @@
         <meta charset="UTF-8" />
         <title>hello phaser!</title>
         <script src="lib/phaser.min.js"></script>
+        <script src="src/Start.js"></script>
     </head>
     <body>
 
     <script type="text/javascript">
 
     window.onload = function() {
-
-        var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
-
-        function preload () {
-
-            game.load.image('logo', 'assets/phaser.png');
-
+        
+        //Set browser with and height
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        
+        //Initialize Phaser
+        var game = new Phaser.Game(width, height, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+        
+        //Introduce a new class
+        var start = null;
+        
+        //Contains code to handle the loading of assets needed by the game
+        function preload() {
+            
+            //Allocate the class to hold the main functionalities.
+            start = new Start(game);
+            //Use preload from class
+            start.preload();
+        }
+        
+        //Contains the bulk of games set-up code, creating game objects and the like
+        function create() {
+            //Use create from class
+            start.create();
         }
 
-        function create () {
-
-            var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
-            logo.anchor.setTo(0.5, 0.5);
-
-        }
-
+        //Does things like poll for input to move a player, check for object collision, etc. 
+        //Heart of the game
         function update() {
         
         }
