@@ -1,21 +1,18 @@
-Start = function(game){
-
-	this.game = game;
-	this.logo = null;
-
-}
-
-Start.prototype = {
-
-	preload: function(){
-		this.game.load.image('logo', 'assets/phaser.png');
-	},
-	create: function(){
-		this.logo = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'logo');
-        this.logo.anchor.setTo(0.5, 0.5);
-	},
-	update: function(){
-
-	}
-
+var Bubble = {};
+Bubble.Start = function(game) {};
+Bubble.Start.prototype = {
+    preload: function() {
+        // preload the loading indicator first before anything else
+        this.load.image('preloaderBar', 'assets/loading-bar.png');
+    },
+    create: function() {
+        // set scale options
+        this.input.maxPointers = 1;
+        this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+        this.scale.pageAlignHorizontally = true;
+        this.scale.pageAlignVertically = true;
+        this.scale.setScreenSize(true);
+        // start the Preloader state
+        this.state.start('Preloader');
+    }
 };
