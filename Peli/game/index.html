@@ -2,8 +2,9 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <title>hello phaser!</title>
-        <script src="lib/phaser.min.js"></script>
+        <title></title>
+        <style> body{ margin: 0; background: #B4D9E7; } </style>
+        <script type="text/javascript" src="lib/phaser.js"></script>
         <script type="text/javascript" src="src/Start.js"></script>
         <script type="text/javascript" src="src/Preload.js"></script>
         <script type="text/javascript" src="src/MainMenu.js"></script>
@@ -12,12 +13,12 @@
     <body>
         <script>
         (function(){
-            var game = new Phaser.Game(640, 960, Phaser.AUTO, 'game');
-            game.state.add('Start', Bubble.Boot);
-            game.state.add('Preload', Bubble.Preloader);
+            var game = new Phaser.Game(600, 800, Phaser.AUTO, 'game');
+            game.state.add('Start', Bubble.Start);
+            game.state.add('Preload', Bubble.Preload);
             game.state.add('MainMenu', Bubble.MainMenu);
             game.state.add('Game', Bubble.Game);
-            game.state.start('Boot');
+            game.state.start('Start');
         })();
         </script>
     </body>
