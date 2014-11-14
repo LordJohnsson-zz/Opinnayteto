@@ -1,12 +1,10 @@
 Bubble.Game = function(game){
-	// define needed variables for Bubble.Game
-	this._player = null;
-	this._wallGroup = null;
-	this._bubbleGroup = null;
+	// define variables for Bubble.Game
+	this._wallCollisionGroup = null;
+	this._bubbleCollisionGroup = null;
 	this._spawnBubbleTimer = 0;
 	this._fontStyle = null;
-	this._ground = null;
-	this._wall = null;
+	this._mouseBody = null;
 	// define Bubble variables to reuse them in Bubble.item functions
 	Bubble._scoreText = null;
 	Bubble._score = 0;
@@ -14,108 +12,142 @@ Bubble.Game = function(game){
 Bubble.Game.prototype = {
 	create: function(){
 		// start the physics engine
-		this.physics.startSystem(Phaser.Physics.ARCADE);
-		// set the global gravity
-			//this.physics.arcade.gravity.y = 200;
-		// display images background & score
-		this.add.sprite(0, 0, 'background');
-		this.add.sprite(0, 0, 'score-bg');
-		// wall group contains the walls where bubbles will collide
-		_wallGroup = this.add.group();
-		// enable physics for any object that is created in this group
-		_wallGroup.enableBody = true;
-		// create the ground
-		this._ground = _wallGroup.create(0, Bubble.GAME_HEIGHT-169, 'floor');
-		//  This stops it from falling away when bubbles hit it
-    	this._ground.body.immovable = true;
-   		// create side walls
-			//this._wall = _wallGroup.create(0,0,'');
-			//this._wall.body.immovable = true;
-			//this._wall = _wallGroup.create(Bubble.GAME_WIDTH-2,0,'');
-			//this._wall.body.immovable = true;
-		// add pause button
-			//this.add.button(Bubble.GAME_WIDTH-96-10, 5, 'button-pause', this.managePause, this);
-		// create the player
-		this._player = this.add.sprite(5, 660, 'monster-idle');
-		// add player animation
-		this._player.animations.add('idle', [0,1,2,3,4,5,6,7,8,9,10,11,12], 10, true);
-		// play the animation
-		this._player.animations.play('idle');
+		this.physics.startSystem(Phaser.Physics.P2JS);
+		this.physics.p2.gravity.y = 200;
+		// turn on impact events for the world
+    	this.physics.p2.setImpactEvents(true);
+    	this.physics.p2.defaultRestitution = 0.8;
+    	//this.physics.p2.gravity.y = 200;
+
+    	// create collision group for bubbles
+    	this._bubbleCollisionGroup = this.physics.p2.createCollisionGroup();
+    	this._wallCollisionGroup = this.physics.p2.createCollisionGroup();
+		this.physics.p2.updateBoundsCollisionGroup();
+
+		// create array from backgrounds, randomly pick one & display it
+		var background = ['BG1','BG2','BG3','BG4','BG5','BG6'];
+		bgType = Math.floor(Math.random()*6);
+		this.add.sprite(0, 0, background[bgType]);
+		
+		// create the ground & side walls, enable physics & make them static
+		var _ground = this.add.sprite(300, 684, 'floor');
+		var _wall_left = this.add.sprite(6,300,'wall_left');
+		var _wall_right = this.add.sprite(594,300,'wall_right');
+		this.physics.p2.enable([ _ground, _wall_right, _wall_left ], false);
+		_ground.body.setCollisionGroup(this._wallCollisionGroup);
+		_ground.body.collides([this._bubbleCollisionGroup]);
+		_ground.body.static = true;
+		_wall_left.body.setCollisionGroup(this._wallCollisionGroup);
+		_wall_left.body.collides([this._bubbleCollisionGroup]);
+		_wall_left.body.static = true;
+		_wall_right.body.setCollisionGroup(this._wallCollisionGroup);
+		_wall_right.body.collides([this._bubbleCollisionGroup]);
+		_wall_right.body.static = true;
+
+		// create the player, add player animation & play the animation
+		var _ville = this.add.sprite(5, 600, 'monster-idle');
+		_ville.animations.add('idle', [0,1,2,3,4,5,6,7,8,9,10,11,12], 10, true);
+		_ville.animations.play('idle');
+
 		// set font style
-		this._fontStyle = { font: "30px Arial", fill: "#FFFFFF", stroke: "#333", strokeThickness: 5, align: "center" };
+		this._fontStyle = { 
+			font: "30px Arial", 
+			fill: "#FFFFFF", 
+			stroke: "#333", 
+			strokeThickness: 5, 
+			align: "center" 
+		};
+		
 		// initialize the spawn timer
 		this._spawnBubbleTimer = 0;
-		// initialize the score text with 0
+		// add score image & initialize the score text with 0
+		this.add.sprite(0, 0, 'score-bg');
 		Bubble._scoreText = this.add.text(84, 29.5, "0", this._fontStyle);
-		// create new group for bubble
-		this._bubbleGroup = this.add.group();
-		//  enable physics for any bubble that is created in this group
-    	this._bubbleGroup.enableBody = true;
+		
 		// spawn first bubble
 		Bubble.item.spawnBubble(this);
+
+		// create physics body for mouse which will be used for dragging clicked bodies
+		this._mouseBody = new p2.Body();
+		this.physics.p2.world.addBody(this._mouseBody);
+	        
 	},
-	/*managePause: function(){
-		// pause the game
-			this.game.paused = true;
-		// add proper informational text
-			var pausedText = this.add.text(100, 250, "Game paused.\nTap anywhere to continue.", this._fontStyle);
-		// set event listener for the user's click/tap the screen
-			this.input.onDown.add(function(){
-				// remove the pause text
-				pausedText.destroy();
-				// unpause the game
-				this.game.paused = false;
-			}, this);
-	},*/
 	update: function(){
-		//  Collide the bubbles with the walls and other bubbles
-		this.physics.arcade.collide(this._bubbleGroup, _wallGroup);
-		this.physics.arcade.collide(this._bubbleGroup, this._bubbleGroup);
 		// update timer every frame
 		this._spawnBubbleTimer += this.time.elapsed;
-		// if spawn timer reach five second (5000 miliseconds)
-		if(this._spawnBubbleTimer > 1000) {
+		// if spawn timer reach five second (5000 milliseconds)
+		if(this._spawnBubbleTimer > 5000) {
 			// reset it
 			this._spawnBubbleTimer = 0;
 			// and spawn new bubble
 			Bubble.item.spawnBubble(this);
 		}
-		// loop through all bubble on the screen
-		this._bubbleGroup.forEach(function(bubble){
-			// to rotate them accordingly
-			bubble.angle += bubble.rotateMe;
-		});
+	},
+};
+
+/* MOUSE FUNCTIONS */
+Bubble.mouse = {
+	click: function(pointer, bubble) {
+
+		var bodies = this.physics.p2.hitTest(pointer.position, [bubble.body]);
+		// p2 uses different coordinate system, so convert the pointer position to p2's coordinate system
+		var physicsPos = [this.physics.p2.pxmi(pointer.position.x), this.physics.p2.pxmi(pointer.position.y)];
+	
+		if (bodies.length)
+		{
+			var clickedBody = bodies[0];
+			
+			var localPointInBody = [0, 0];
+			// this function takes physicsPos and coverts it to the body's local coordinate system
+			clickedBody.toLocalFrame(localPointInBody, physicsPos);
+			
+			// use a revoluteContraint to attach mouseBody to the clicked body
+			mouseConstraint = this.game.physics.p2.createRevoluteConstraint(mouseBody, [0, 0], clickedBody, [game.physics.p2.mpxi(localPointInBody[0]), game.physics.p2.mpxi(localPointInBody[1]) ]);
+		}	
+	},
+	release: function() {
+		// remove constraint from object's body
+		game.physics.p2.removeConstraint(mouseConstraint);
+
+	},
+	move: function(pointer) {
+
+		// p2 uses different coordinate system, so convert the pointer position to p2's coordinate system
+		mouseBody.position[0] = game.physics.p2.pxmi(pointer.position.x);
+		mouseBody.position[1] = game.physics.p2.pxmi(pointer.position.y);
+
 	}
 };
 
+/* BUBBLE FUNCTIONS */
 Bubble.item = {
 	spawnBubble: function(game){
-		// calculate drop position (from 0 to game width) on the x axis
-		var dropPos = Math.floor(Math.random()*Bubble.GAME_WIDTH+100);
-		// define the offset for every bubble
-			//var dropOffset = [-27,-36,-36,-38,-48];
-		// randomize bubble type
-			//var bubbleType = Math.floor(Math.random()*5);
-		// create new bubble: game.add.sprite(dropPos,dropOffset[bubbleType], 'bubble');
-		var bubble = game.add.sprite(dropPos, -98, 'bubble');
-		// add new animation frame
-		bubble.animations.add('anim', [0], 10, true);
-		// play the newly created animation
+		// calculate drop position & define the offset for every bubble
+		var dropPos = Math.floor((Math.random()*(Bubble.GAME_WIDTH-115)) + 115);
+	//	var dropOffset = [-75,-70,-75,-70];
+		
+		// randomize bubble type & create new bubble
+		bubbleType = Math.floor(Math.random()*4);
+		var bubble = game.add.sprite(dropPos, 98, 'bubbles');
+
+		// add new animation frame & play it
+		bubble.animations.add('anim', [bubbleType], 10, true);
 		bubble.animations.play('anim');
-		// enable bubble body for physic engine
-		game.physics.enable(bubble, Phaser.Physics.ARCADE);
-		// enable bubble to be clicked/tapped
-		bubble.inputEnabled = true;
-		// add event listener to click/tap
-		bubble.events.onInputDown.add(this.clickBubble, this);
-		// add gravity to bubble
-		bubble.body.gravity.y = 200;
-		// set the anchor (for rotation, position etc) to the middle of the bubble
-		bubble.anchor.setTo(0.5, 0.5);
-		// set the random rotation value
-		bubble.rotateMe = (Math.random()*4)-2;
-		// add bubble to the group
-		game._bubbleGroup.add(bubble);
+
+		// enable bubble body for physic engine and add specifications
+		game.physics.p2.enable(bubble, false);
+
+		bubble.body.clearShapes();
+		bubble.body.setCollisionGroup(game._bubbleCollisionGroup);
+		bubble.body.collides([game._bubbleCollisionGroup, game._wallCollisionGroup]);
+			//bubble.body.setCircle(98);
+			//bubble.body.setRectangle(15, 15, 0, 0);
+			//bubble.body.gravity.y = 200;
+		
+		// attach pointer events for mouse inputs
+			//game.input.onDown.add(Bubble.mouse.click, game, bubble);
+			//game.input.onUp.add(Bubble.mouse.release, game);
+			//game.input.addMoveCallback(Bubble.mouse.move, game);
 	},
 	clickBubble: function(bubble){
 		// kill the bubble when it's clicked

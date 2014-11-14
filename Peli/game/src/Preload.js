@@ -10,16 +10,19 @@ Bubble.Preload.prototype = {
         this.preloadBar = this.add.sprite((Bubble.GAME_WIDTH-300)/2, (Bubble.GAME_HEIGHT-27)/2, 'preloaderBar');
         this.load.setPreloadSprite(this.preloadBar);
         // load images
-        this.load.image('background', 'assets/BG_8.png');
-        this.load.image('background_menu', 'assets/BG_3.png');
-        this.load.image('floor', 'assets/BG__8_Floor.png');
-            //this.load.image('monster-cover', 'img/monster-cover.png');
-            //this.load.image('title', 'assets/title.png');
-            //this.load.image('game-over', 'img/gameover.png');
+        this.load.image('BG1', 'assets/BG_1.png');
+        this.load.image('BG2', 'assets/BG_2.png');
+        this.load.image('BG3', 'assets/BG_3.png');
+        this.load.image('BG4', 'assets/BG_4.png');
+        this.load.image('BG5', 'assets/BG_5.png');
+        this.load.image('BG6', 'assets/BG_6.png');
+        this.load.image('wall_left', 'assets/BG_8_Left.png')
+        this.load.image('wall_right', 'assets/BG_8_Right.png')
+        this.load.image('background_menu', 'assets/BG_START.png');
+        this.load.image('floor', 'assets/BG_Floor.png');
         this.load.image('score-bg', 'assets/score-bg.png');
-            //this.load.image('button-pause', 'img/button-pause.png');
         // load spritesheets
-        this.load.spritesheet('bubble', 'assets/Bubble1.png', 100, 98);
+        this.load.spritesheet('bubbles', 'assets/Bubble_all.png', 100, 98);
         this.load.spritesheet('monster-idle','assets/monster-idle.png', 103, 131);
         this.load.spritesheet('button-start','assets/start_button.png', 106, 106);
     },
