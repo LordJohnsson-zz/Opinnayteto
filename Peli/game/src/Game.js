@@ -15,7 +15,7 @@ Bubble.Game.prototype = {
 		this.physics.startSystem(Phaser.Physics.P2JS);
     	this.physics.p2.restitution = 0.15;
     	// set gravity for the world
-		this.physics.p2.gravity.y = 100;
+		this.physics.p2.gravity.y = 50;
 
 		// create array from backgrounds, randomly pick one & display it
 		var background = ['BG1','BG2','BG3','BG4','BG5','BG6'];
@@ -30,7 +30,7 @@ Bubble.Game.prototype = {
 
 		// enable physics to objects & make them static
 		//TODO: SET FALSE FOR DEBUGGING
-		this.physics.p2.enable([ _ground, _wall_right, _wall_left ], true);
+		this.physics.p2.enable([ _ground, _wall_right, _wall_left ], false);
 		_ground.body.static = true;
 		_wall_left.body.static = true;
 		_wall_right.body.static = true;
@@ -55,29 +55,16 @@ Bubble.Game.prototype = {
 		this.add.sprite(0, 0, 'score-bg');
 		this._scoreText = this.add.text(84, 29.5, "0", this._fontStyle);
 		
-		// spawn first 5 bubbles
+		// spawn first 5 bubbles with spawn call
 		for (var i = 0; i < 5; i++) {
-			// randomize bubble type
-			bubbleType = Math.floor(Math.random()*4);
-			//spawn new bubble
-			var bubble = this.add.sprite(this.rnd.integerInRange(15, 585), 150, 'bubbles');
-			// add new animation frame & play it
-			bubble.animations.add('anim', [bubbleType], 10, true);
-			bubble.animations.play('anim');
-			// enable bubble body for physic engine
-			//TODO: SET FALSE FOR DEBUGGING
-			this.physics.p2.enable(bubble, false);
-			// create circular collision and
-			bubble.body.setCircle(50);
-			// some rotation between 1 - 50 pixels
-			bubble.body.rotateLeft(Math.random()*50);
-			// add bubbles to an array
-			this._bubbleArray.push(bubble);
+			Bubble.item.spawnBubble(this);
 		};
 			
 		// create physics body for mouse which will be used for dragging clicked bodies
 		this._mouseBody = new p2.Body();
 		this.physics.p2.world.addBody(this._mouseBody);
+
+
 	        
 	},
 	update: function(){
@@ -87,20 +74,12 @@ Bubble.Game.prototype = {
 		this._spawnBubbleTimer += this.time.elapsed;
 
 		// if spawn timer reach five second (5000 milliseconds)
-		if(this._spawnBubbleTimer > 1000) {
+		if(this._spawnBubbleTimer > 5000) {
 			// reset it
 			this._spawnBubbleTimer = 0;
 
-			// spawn new bubble with randomize bubble type
-			bubbleType = Math.floor(Math.random()*4);
-			var bubble = this.add.sprite(this.rnd.integerInRange(115, 485), 15, 'bubbles');
-			bubble.animations.add('anim', [bubbleType], 10, true);
-			bubble.animations.play('anim');
-			//TODO: SET FALSE FOR DEBUGGING
-			this.physics.p2.enable(bubble, false);
-			bubble.body.setCircle(50);
-			bubble.body.rotateRight(Math.random()*50);
-			this._bubbleArray.push(bubble);
+			// call the spawner for bubbles
+			Bubble.item.spawnBubble(this);
 			
 		}
 		// rotate every bubble for 3 pixels to left in every frame
@@ -110,6 +89,32 @@ Bubble.Game.prototype = {
 
 		
 	},
+};
+Bubble.item = {
+	spawnBubble: function(game) {
+		// randomize bubble type
+		bubbleType = Math.floor(Math.random()*2);
+		//spawn new bubble
+		var bubble = game.add.sprite(game.rnd.integerInRange(5, 495), 25, 'bubbles');
+		// add new animation frame & play it
+		bubble.animations.add('anim', [bubbleType], 10, true);
+		bubble.animations.play('anim');
+		// enable bubble body for physic engine
+		//TODO: SET FALSE FOR DEBUGGING
+		game.physics.p2.enable(bubble, false);
+		// create circular collision and
+		bubble.body.setCircle(50);
+		// some rotation between 1 - 50 pixels
+		bubble.body.rotateLeft(Math.random()*50);
+		// add bubbles to an array
+		game._bubbleArray.push(bubble);
+
+		
+	},
+	startDrag: function(){
+	},
+	stopDrag: function(){
+	}
 };
 
 /* MOUSE FUNCTIONS */
