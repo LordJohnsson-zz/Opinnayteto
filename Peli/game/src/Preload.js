@@ -16,10 +16,11 @@ Bubble.Preload.prototype = {
         this.load.image('BG4', 'assets/BG_4.png');
         this.load.image('BG5', 'assets/BG_5.png');
         this.load.image('BG6', 'assets/BG_6.png');
-        this.load.image('wall_left', 'assets/BG_8_Left.png')
-        this.load.image('wall_right', 'assets/BG_8_Right.png')
+        this.load.image('wall_left', 'assets/BG_Left.png')
+        this.load.image('wall_right', 'assets/BG_Right.png')
         this.load.image('background_menu', 'assets/BG_START.png');
-        this.load.image('floor', 'assets/BG_Floor.png');
+        this.load.image('floor', 'assets/BG_Ground.png');
+        this.load.image('FloorBox', 'assets/BG_FloorBox.png');
         this.load.image('score-bg', 'assets/score-bg.png');
         // load spritesheets
         this.load.spritesheet('bubbles', 'assets/Bubble_all.png', 100, 98);
