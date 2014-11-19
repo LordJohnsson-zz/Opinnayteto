@@ -4,6 +4,7 @@ Bubble.Game = function(game){
 	this._fontStyle = null;
 	this._mouseBody = null;
 	this._bubbleArray = new Array();
+	this._bubblePos = new Array();
 	// define Bubble variables to reuse them in Bubble.item functions
 	Bubble._scoreText = null;
 	Bubble._score = 0;
@@ -24,12 +25,12 @@ Bubble.Game.prototype = {
 
 		// create the ground & side walls
 		var _ground = this.add.sprite(300, 700, 'floor');
-		var _wall_left = this.add.sprite(6,300,'wall_left');
-		var _wall_right = this.add.sprite(594,300,'wall_right');
+		var _wall_left = this.add.sprite(-5,300,'wall_left');
+		var _wall_right = this.add.sprite(604,300,'wall_right');
 
 		// enable physics to objects & make them static
 		//TODO: SET FALSE FOR DEBUGGING
-		this.physics.p2.enable([ _ground, _wall_right, _wall_left ], false);
+		this.physics.p2.enable([ _ground, _wall_right, _wall_left ], true);
 		_ground.body.static = true;
 		_wall_left.body.static = true;
 		_wall_right.body.static = true;
@@ -52,14 +53,14 @@ Bubble.Game.prototype = {
 		this._spawnBubbleTimer = 0;
 		// add score image & initialize the score text with 0
 		this.add.sprite(0, 0, 'score-bg');
-		Bubble._scoreText = this.add.text(84, 29.5, "0", this._fontStyle);
+		this._scoreText = this.add.text(84, 29.5, "0", this._fontStyle);
 		
 		// spawn first 5 bubbles
 		for (var i = 0; i < 5; i++) {
 			// randomize bubble type
 			bubbleType = Math.floor(Math.random()*4);
 			//spawn new bubble
-			var bubble = this.add.sprite(this.rnd.integerInRange(15, 585), 98, 'bubbles');
+			var bubble = this.add.sprite(this.rnd.integerInRange(15, 585), 150, 'bubbles');
 			// add new animation frame & play it
 			bubble.animations.add('anim', [bubbleType], 10, true);
 			bubble.animations.play('anim');
@@ -80,17 +81,19 @@ Bubble.Game.prototype = {
 	        
 	},
 	update: function(){
+		this.physics.p2.gravity.y = 50;
+
 		// update timer every frame
 		this._spawnBubbleTimer += this.time.elapsed;
 
 		// if spawn timer reach five second (5000 milliseconds)
-		if(this._spawnBubbleTimer > 5000) {
+		if(this._spawnBubbleTimer > 1000) {
 			// reset it
 			this._spawnBubbleTimer = 0;
 
 			// spawn new bubble with randomize bubble type
 			bubbleType = Math.floor(Math.random()*4);
-			var bubble = this.add.sprite(this.rnd.integerInRange(115, 485), 98, 'bubbles');
+			var bubble = this.add.sprite(this.rnd.integerInRange(115, 485), 15, 'bubbles');
 			bubble.animations.add('anim', [bubbleType], 10, true);
 			bubble.animations.play('anim');
 			//TODO: SET FALSE FOR DEBUGGING
@@ -98,15 +101,14 @@ Bubble.Game.prototype = {
 			bubble.body.setCircle(50);
 			bubble.body.rotateRight(Math.random()*50);
 			this._bubbleArray.push(bubble);
+			
 		}
 		// rotate every bubble for 3 pixels to left in every frame
 		for (var i = 0; i < this._bubbleArray.length; i++) {
 			this._bubbleArray[i].body.rotateLeft(3);
-
-			var bubblePos = [this.physics.p2.pxmi(bubble.position.x), this.physics.p2.pxmi(bubble.position.y)];
-
-			if (true) {};
 		};
+
+		
 	},
 };
 
