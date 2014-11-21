@@ -19,6 +19,7 @@ Bubble.Preload.prototype = {
         this.load.image('wall_left', 'assets/BG_Left.png')
         this.load.image('wall_right', 'assets/BG_Right.png')
         this.load.image('background_menu', 'assets/BG_START.png');
+        this.load.image('game-over', 'assets/gameover.png');
         this.load.image('floor', 'assets/BG_Ground.png');
         this.load.image('FloorBox', 'assets/BG_FloorBox.png');
         this.load.image('score-bg', 'assets/score-bg.png');
@@ -26,6 +27,7 @@ Bubble.Preload.prototype = {
         this.load.spritesheet('bubbles', 'assets/Bubbles.png', 100, 100);
         this.load.spritesheet('monster-idle','assets/monster-idle.png', 103, 131);
         this.load.spritesheet('button-start','assets/start_button.png', 106, 106);
+        this.load.spritesheet('button-pause','assets/pause_button.png', 100, 100);
     },
     create: function() {
         // start the MainMenu state

@@ -5,6 +5,7 @@ Bubble.Game = function(game){
 	this._mouseBody = null;
 	this._bubbleArray = new Array();
 	this._bubblePos = new Array();
+	this._mouseConstraint = null;
 	// define Bubble variables to reuse them in Bubble.item functions
 	Bubble._scoreText = null;
 	Bubble._score = 0;
@@ -22,6 +23,9 @@ Bubble.Game.prototype = {
 		bgType = Math.floor(Math.random()*6);
 		this.add.sprite(0, 0, background[bgType]);
 		this.add.sprite(0,600, 'FloorBox');
+
+		// add pause button
+		this.add.button(Bubble.GAME_WIDTH-125, Bubble.GAME_HEIGHT-150, 'button-pause', this.pauseGame, this, 0,0,1);
 
 		// create the ground & side walls
 		var _ground = this.add.sprite(300, 700, 'floor');
@@ -64,7 +68,10 @@ Bubble.Game.prototype = {
 		this._mouseBody = new p2.Body();
 		this.physics.p2.world.addBody(this._mouseBody);
 
-
+		// attach pointer events
+		this.input.onDown.add(Bubble.mouse.click, this);
+		this.input.onUp.add(Bubble.mouse.release, this);
+		this.input.addMoveCallback(Bubble.mouse.move, this);
 	        
 	},
 	update: function(){
@@ -74,7 +81,7 @@ Bubble.Game.prototype = {
 		this._spawnBubbleTimer += this.time.elapsed;
 
 		// if spawn timer reach five second (5000 milliseconds)
-		if(this._spawnBubbleTimer > 5000) {
+		if(this._spawnBubbleTimer > 500) {
 			// reset it
 			this._spawnBubbleTimer = 0;
 
@@ -82,13 +89,41 @@ Bubble.Game.prototype = {
 			Bubble.item.spawnBubble(this);
 			
 		}
-		// rotate every bubble for 3 pixels to left in every frame
-		for (var i = 0; i < this._bubbleArray.length; i++) {
-			this._bubbleArray[i].body.rotateLeft(3);
-		};
 
-		
+		for (var i = 0; i < this._bubbleArray.length; i++) {
+			// rotate every bubble for 3 pixels to left in every frame
+			this._bubbleArray[i].rotateLeft(3);
+		 };
+
+		if (this._bubbleArray.length == 36) {
+			// pause game for 'game over' -screen
+			this.game.paused = true
+			this.add.sprite((Bubble.GAME_WIDTH-594)/2, (Bubble.GAME_HEIGHT-271)/2, 'game-over');
+			this.input.onDown.add(this.gameStateToMainMenu, this);
+		};
 	},
+	// changes the game state from pause menu or 
+	gameStateToMainMenu: function(){
+		this.state.start('MainMenu');
+	},
+	// function for handling game pause
+	pauseGame: function(){
+		this.game.paused = true;
+
+		this.input.onDown.add(function(self){ 
+			// check wheter game is paused, if not, pause the game 
+			if (this.game.paused) {
+				// calculate pause-button corners
+				var x1 = (Bubble.GAME_WIDTH-125), x2 = (Bubble.GAME_WIDTH-125) + 100,
+					y1 = (Bubble.GAME_HEIGHT-150), y2= (Bubble.GAME_HEIGHT-150) + 100;
+				
+				if (event.x > x1 && event.x < x2 && event.y > y1 && event.y < y2) {
+					this.game.paused = false;
+				};
+			};
+
+		},this);
+	}
 };
 Bubble.item = {
 	spawnBubble: function(game) {
@@ -107,14 +142,8 @@ Bubble.item = {
 		// some rotation between 1 - 50 pixels
 		bubble.body.rotateLeft(Math.random()*50);
 		// add bubbles to an array
-		game._bubbleArray.push(bubble);
-
-		
+		game._bubbleArray.push(bubble.body);
 	},
-	startDrag: function(){
-	},
-	stopDrag: function(){
-	}
 };
 
 /* MOUSE FUNCTIONS */
@@ -134,19 +163,19 @@ Bubble.mouse = {
 			clickedBody.toLocalFrame(localPointInBody, physicsPos);
 			
 			// use a revoluteContraint to attach mouseBody to the clicked body
-			mouseConstraint = this.game.physics.p2.createRevoluteConstraint(mouseBody, [0, 0], clickedBody, [game.physics.p2.mpxi(localPointInBody[0]), game.physics.p2.mpxi(localPointInBody[1]) ]);
+			this._mouseConstraint = this.physics.p2.createRevoluteConstraint(this._mouseBody, [0, 0], clickedBody, [this.physics.p2.mpxi(localPointInBody[0]), this.physics.p2.mpxi(localPointInBody[1]) ]);
 		}	
 	},
 	release: function() {
 		// remove constraint from object's body
-		game.physics.p2.removeConstraint(mouseConstraint);
+		this.physics.p2.removeConstraint(this._mouseConstraint);
 
 	},
 	move: function(pointer) {
 
 		// p2 uses different coordinate system, so convert the pointer position to p2's coordinate system
-		mouseBody.position[0] = game.physics.p2.pxmi(pointer.position.x);
-		mouseBody.position[1] = game.physics.p2.pxmi(pointer.position.y);
+		this._mouseBody.position[0] = this.physics.p2.pxmi(pointer.position.x);
+		this._mouseBody.position[1] = this.physics.p2.pxmi(pointer.position.y);
 
 	}
 };
