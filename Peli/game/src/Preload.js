@@ -28,6 +28,8 @@ Bubble.Preload.prototype = {
         this.load.spritesheet('monster-idle','assets/monster-idle.png', 103, 131);
         this.load.spritesheet('button-start','assets/start_button.png', 106, 106);
         this.load.spritesheet('button-pause','assets/pause_button.png', 100, 100);
+        // load audio
+        this.load.audio('bubble_appear', 'assets/bubble2.wav');
     },
     create: function() {
         // start the MainMenu state
