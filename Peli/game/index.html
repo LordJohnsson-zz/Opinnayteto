@@ -5,8 +5,10 @@
         <title></title>
         <style> body{ margin: 0; background: #B4D9E7; } </style>
         <script type="text/javascript" src="lib/phaser.js"></script>
-        <script type="text/javascript" src="src/Start.js"></script>
+        <script type="text/javascript" src="src/Style.js"></script>
+        <script type="text/javascript" src="src/Load.js"></script>
         <script type="text/javascript" src="src/Preload.js"></script>
+        <script type="text/javascript" src="src/PauseHandel.js"></script>
         <script type="text/javascript" src="src/MainMenu.js"></script>
         <script type="text/javascript" src="src/Game.js"></script>
     </head>
@@ -14,11 +16,11 @@
         <script>
         (function(){
             var game = new Phaser.Game(600, 800, Phaser.AUTO, 'game');
-            game.state.add('Start', Bubble.Start);
+            game.state.add('Load', Bubble.Load);
             game.state.add('Preload', Bubble.Preload);
             game.state.add('MainMenu', Bubble.MainMenu);
             game.state.add('Game', Bubble.Game);
-            game.state.start('Start');
+            game.state.start('Load');
         })();
         </script>
     </body>

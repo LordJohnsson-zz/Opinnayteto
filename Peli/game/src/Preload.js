@@ -23,16 +23,26 @@ Bubble.Preload.prototype = {
         this.load.image('floor', 'assets/BG_Ground.png');
         this.load.image('FloorBox', 'assets/BG_FloorBox.png');
         this.load.image('score-bg', 'assets/score-bg.png');
+        this.load.image('pauseMenu', 'assets/PauseMenu.png');
         // load spritesheets
         this.load.spritesheet('bubbles', 'assets/Bubbles.png', 100, 100);
         this.load.spritesheet('monster-idle','assets/monster-idle.png', 103, 131);
         this.load.spritesheet('button-start','assets/start_button.png', 106, 106);
         this.load.spritesheet('button-pause','assets/pause_button.png', 100, 100);
+        this.load.spritesheet('button-continue','assets/continue.png', 85, 85);
+        this.load.spritesheet('button-reload','assets/reload.png', 85, 85);
+        this.load.spritesheet('button-toMainMenu','assets/backToMenu.png', 85, 85);
         // load audio
         this.load.audio('bubble_appear', 'assets/bubble2.wav');
     },
     create: function() {
         // start the MainMenu state
-        this.state.start('MainMenu');
+        // if (this.state.states.checkState("Game")) {
+        //     // start the Game state
+        //     this.state.start('Game');
+        // }
+        // else{
+            this.state.start('MainMenu');
+        //}
     }
 };

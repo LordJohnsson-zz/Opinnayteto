@@ -1,6 +1,6 @@
 var Bubble = {};
-Bubble.Start = function(game) {};
-Bubble.Start.prototype = {
+Bubble.Load = function(game) {};
+Bubble.Load.prototype = {
     preload: function() {
         // preload the loading indicator first before anything else
         this.load.image('preloaderBar', 'assets/loading-bar.png');
