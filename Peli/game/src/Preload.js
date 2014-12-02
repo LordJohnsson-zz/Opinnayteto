@@ -16,14 +16,11 @@ Bubble.Preload.prototype = {
         this.load.image('BG4', 'assets/BG_4.png');
         this.load.image('BG5', 'assets/BG_5.png');
         this.load.image('BG6', 'assets/BG_6.png');
-        this.load.image('wall_left', 'assets/BG_Left.png')
-        this.load.image('wall_right', 'assets/BG_Right.png')
         this.load.image('background_menu', 'assets/BG_START.png');
-        this.load.image('game-over', 'assets/gameover.png');
-        this.load.image('floor', 'assets/BG_Ground.png');
+        this.load.image('gameOver', 'assets/game-over.png');
         this.load.image('FloorBox', 'assets/BG_FloorBox.png');
         this.load.image('score-bg', 'assets/score-bg.png');
-        this.load.image('pauseMenu', 'assets/PauseMenu.png');
+        this.load.image('pauseMenu', 'assets/pauseMenu.png');
         // load spritesheets
         this.load.spritesheet('bubbles', 'assets/Bubbles.png', 100, 100);
         this.load.spritesheet('monster-idle','assets/monster-idle.png', 103, 131);
@@ -34,15 +31,11 @@ Bubble.Preload.prototype = {
         this.load.spritesheet('button-toMainMenu','assets/backToMenu.png', 85, 85);
         // load audio
         this.load.audio('bubble_appear', 'assets/bubble2.wav');
+        this.load.audio('buttonClick', 'assets/button-click.wav');
+        this.load.audio('gameOver', 'assets/game-over.wav');
+        this.load.audio('counter', 'assets/counter.wav');
     },
     create: function() {
-        // start the MainMenu state
-        // if (this.state.states.checkState("Game")) {
-        //     // start the Game state
-        //     this.state.start('Game');
-        // }
-        // else{
-            this.state.start('MainMenu');
-        //}
+        this.state.start('MainMenu');
     }
 };

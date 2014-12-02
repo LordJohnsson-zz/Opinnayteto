@@ -1,49 +1,25 @@
-Bubble.Game = function(game){
-	// define variables for Bubble.Game
-	this._spawnBubbleTimer = 0;
-	this._start = true;
-	this._counter = 5;
-	this._counterText = "";
-	this._fontStyle = null;
-	this._bubbleArray = 0;
-	this._paused = true;
-	this.btnPause = null;
-	this._ville = null;
-	this._reload = false;
-	// define Bubble variables to reuse them in Bubble.item functions
-	Bubble._scoreText = null;
-	Bubble._score = 0;
-	Bubble._appearSound = null; 
-};
+Bubble.Game = function(game){};
 Bubble.Game.prototype = {
 	create: function(){
-		if (this._reload) {
-			this.setVariables();
-		}
+		// define game variables here
+		this.setVariables();
+
+		// set world boundary
+		this.world.setBounds(0, 0, 600, 600);
+
 		// start the physics engine
 		this.physics.startSystem(Phaser.Physics.P2JS);
     	this.physics.p2.restitution = 0.25;
-    	this.physics.p2.setBounds(10,0,590,600,true,true,false,true);
+    	// set the collision of the wolrd boundary, top collision is set to false for bubbles to drop down
+    	this.physics.p2.setBoundsToWorld(true,true,false,true,false);
     	// set gravity for the world
 		this.physics.p2.gravity.y = 75;
 
 		// create array from backgrounds, randomly pick one & display it
 		var background = ['BG1','BG2','BG3','BG4','BG5','BG6'];
-		bgType = Math.floor(Math.random()*6);
+		bgType = this.rnd.integerInRange(0, 5);
 		this.add.sprite(0, 0, background[bgType]);
 		this.add.sprite(0,600, 'FloorBox');
-
-		// create the ground & side walls
-		var _ground = this.add.sprite(300, 700, 'floor');
-		var _wall_left = this.add.sprite(-5,300,'wall_left');
-		var _wall_right = this.add.sprite(604,300,'wall_right');
-
-		// enable physics to objects & make them static
-		//TODO: SET FALSE FOR DEBUGGING
-		this.physics.p2.enable([ _ground,_wall_left,_wall_right], true);
-		_ground.body.static = true;
-		_wall_left.body.static = true;
-		_wall_right.body.static = true;
 
 		// create the player, add player animation & play the animation
 		this._ville = this.add.sprite(15, 620, 'monster-idle');
@@ -60,9 +36,13 @@ Bubble.Game.prototype = {
 		this._scoreText = this.add.text(84, 29.5, "0", this._fontStyle);
 		// initialize sound
 		this._appearSound = this.game.add.audio('bubble_appear');
+		this._buttonSoundClick = this.game.add.audio('buttonClick');
+		this._gameOverSound = this.game.add.audio('gameOver');
+		this._counterSound = this.game.add.audio('counter');
 
-		// create new array for bubbles
+		// create new array for bubbles and x -spawning point
 		this._bubbleArray = new Array();
+
 		// spawn first 5 bubbles with spawn call
 		for (var i = 0; i < 5; i++) {
 			Bubble.item.spawnBubble(this);
@@ -70,9 +50,13 @@ Bubble.Game.prototype = {
 
 		// add pause button
 		this.btnPause = this.add.button(Bubble.GAME_WIDTH-125, Bubble.GAME_HEIGHT-150, 'button-pause', this.pauseGame, this, 0,0,1);
-		// add in-game menu panel 
-		this.pausePanel = new PauseButton(this.game);
-		this.game.add.existing(this.pausePanel);
+		// add in-game menu panels
+		this.pausePanel = new PausePanel(this.game);
+		this.add.existing(this.pausePanel);
+		this.endPanel = new GameOverPanel(this.game);
+		this.add.existing(this.endPanel);
+
+		this.endPanel.hide();
 
 		this.playGame();
 	},
@@ -90,29 +74,31 @@ Bubble.Game.prototype = {
 			
 		}
 	},
+	// set variables
 	setVariables: function(){
-		// reset variables
+		// define variables for Bubble.Game
 		this._spawnBubbleTimer = 0;
 		this._start = true;
 		this._counter = 5;
 		this._counterText = "";
 		this._fontStyle = null;
 		this._bubbleArray = 0;
+		this._bubbleSpawnX = [0,100,200,300,400,500];
 		this._paused = true;
 		this.btnPause = null;
 		this._ville = null;
-		this._reload = false;
+		// define Bubble variables to reuse them in Bubble.item functions
 		Bubble._scoreText = null;
 		Bubble._score = 0;
-		Bubble._appearSound = null; 
 	},
 	// function for handling game pause
 	pauseGame: function(){
+		// add pause click sound effect
+		this._buttonSoundClick.play();
 		if (!this._paused){
 			// stop the game
 			this._paused = true;
-			this.btnPause.kill();
-			this._reload = true;
+			this.btnPause.visible = false;
 			// show pause menu
 			this.pausePanel.show();
 			// hide all bubbles
@@ -130,8 +116,7 @@ Bubble.Game.prototype = {
 		if(this._paused){
 			//set game running again
 			this._paused = false;
-			this.btnPause.revive();
-			this._reload = false;
+			this.btnPause.visible = true;
 			// hide pause menu
 			this.pausePanel.hide();
 			// show all bubbles
@@ -164,11 +149,13 @@ Bubble.Game.prototype = {
 				game._spawnBubbleTimer = 0;
 				// print counter text
 				if (game._counter == 0) {
-				 	game._counterText = game.add.text(game.world.centerX-200, game.world.centerY-150, "Anna mennä!", startFont);
+				 	game._counterText = game.add.text(game.world.centerX-200, game.world.centerY-50, "Anna mennä!", startFont);
 				 	game._counterText.fontSize = 75;
 				}
-				else{
-					game._counterText = game.add.text(game.world.centerX-50, game.world.centerY-150, game._counter, startFont);
+				if(game._counter > 0){
+					// play counter sound 
+					this._counterSound.play();
+					game._counterText = game.add.text(game.world.centerX-50, game.world.centerY-50, game._counter, startFont);
 				}
 				// decrease counter number 
 				game._counter -= 1;
@@ -205,12 +192,20 @@ Bubble.Game.prototype = {
 	},
 	// to end game
 	gameOver: function(){
+		// play game over sound
+		this._gameOverSound.play();
+		// when game over, pause game
 		this._paused = true;
-		this.add.button((Bubble.GAME_WIDTH-594)/2, (Bubble.GAME_HEIGHT-271)/2,'game-over', this.toMainMenu, this, 0, 0, 0);
-	},
-	// changes the game state from pause menu or 
-	toMainMenu: function(){
-		this.state.start('MainMenu');
+		// hide extra buttons
+		this.btnPause.visible = false;
+		// show game over panel
+		this.endPanel.show();
+		// hide all bubbles
+		for (var i = 0; i < this._bubbleArray.length; i++) {
+			if (this._bubbleArray[i] != null) {
+				this._bubbleArray[i].kill();
+			}
+		};
 	},
 	mouseClick: function(bubble){
 		// collect x and y from bubble
@@ -266,11 +261,14 @@ Bubble.Game.prototype = {
 };
 Bubble.item = {
 	spawnBubble: function(game) {
-			// randomize bubble type
-			bubbleType = Math.floor(Math.random()*2);
 			
+			var x = null;
+			var bubbleType = null;
+			// randomize the x-spawning point and bubble type
+			x = game._bubbleSpawnX[game.rnd.integerInRange(0, 5)];
+			bubbleType = game.rnd.integerInRange(0, 2)
 			//spawn new bubble
-			var bubble = game.add.sprite(game.rnd.integerInRange(25, 495), -50, 'bubbles');
+			var bubble = game.add.sprite(x, -50, 'bubbles');
 			// add new animation frame & play it
 			bubble.animations.add('anim', [bubbleType], 10, true);
 			bubble.animations.play('anim');
