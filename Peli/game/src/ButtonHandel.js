@@ -55,15 +55,14 @@ var GameOverPanel = function(game, parent){
 	var buttonSoundClick = game.add.audio('buttonClick');
 	// Game over panel
 	this.panel = this.create(100, 100, 'gameOver');
-	this.panel.scale.setTo(2,2);
 
-	this.btnReload = this.game.add.button(this.game._width/2-85, 200, 'button-reload', function(){
+	this.btnReload = this.game.add.button(this.game._width/2-85, 205, 'button-reload', function(){
 		buttonSoundClick.play();
 		this.game.state.start("Game");
 	}, this,0,0,1);
 	this.add(this.btnReload);
 
-	this.btnMainMenu = this.game.add.button(this.game._width/2, 200, 'button-toMainMenu', function(){
+	this.btnMainMenu = this.game.add.button(this.game._width/2, 205, 'button-toMainMenu', function(){
 		buttonSoundClick.play();
 		this.game.state.start("MainMenu");
 	}, this, 0,0,1);

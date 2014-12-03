@@ -17,7 +17,7 @@ Bubble.Preload.prototype = {
         this.load.image('BG5', 'assets/BG_5.png');
         this.load.image('BG6', 'assets/BG_6.png');
         this.load.image('background_menu', 'assets/BG_START.png');
-        this.load.image('gameOver', 'assets/game-over.png');
+        this.load.image('gameOver', 'assets/game-over-panel.png');
         this.load.image('FloorBox', 'assets/BG_FloorBox.png');
         this.load.image('score-bg', 'assets/score-bg.png');
         this.load.image('pauseMenu', 'assets/pauseMenu.png');
