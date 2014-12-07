@@ -21,6 +21,7 @@ Bubble.Preload.prototype = {
         this.load.image('FloorBox', 'assets/BG_FloorBox.png');
         this.load.image('score-bg', 'assets/score-bg.png');
         this.load.image('pauseMenu', 'assets/pauseMenu.png');
+        this.load.image('answerBubble', 'assets/Bubble2.png');
         // load spritesheets
         this.load.spritesheet('bubbles', 'assets/Bubbles.png', 100, 100);
         this.load.spritesheet('monster-idle','assets/monster-idle.png', 103, 131);
