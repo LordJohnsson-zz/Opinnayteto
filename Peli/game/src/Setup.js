@@ -136,12 +136,15 @@ var Setup = {
 			// get number from numbers used in the expression
 			if (i<array.length) {
 				// if array contains operator, gives the answer as number to use
-				num = (array[i] == "+" || array[i] == "-" || array[i] == "*" || array[i] == "/") ? array[array.length-1] :  parseInt(array[i]);
+				num = (array[i] == "+" || array[i] == "-" || array[i] == "*" || array[i] == "/" || array[i] == "=") ? array[array.length-1] :  parseInt(array[i]);
 				tempArray.push(game.rnd.integerInRange((num-15), (num+15)));
 			}
 			// otherwise get numbers accoridng to answer only 
 			else{
 				tempArray.push(game.rnd.integerInRange((array[array.length-1]-15), (array[array.length-1]+15)));
+			}
+			if (i == (randomInt*5)-1) {
+				tempArray.push(array[array.length-1]);
 			}
 		};
 		return tempArray;
