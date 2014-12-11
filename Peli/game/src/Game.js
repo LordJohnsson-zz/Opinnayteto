@@ -81,12 +81,9 @@ Bubble.Game.prototype = {
 			for (var i = 0; i < this._bubbleArray.length; i++) {
 				if (this._bubbleArray[i] !== null) {
 					// move text according to bubble positions
-					this._bubbleArray[i].bubbleText.x = Math.floor(this._bubbleArray[i].bubble.x);
-					this._bubbleArray[i].bubbleText.y = Math.floor(this._bubbleArray[i].bubble.y);
+					this._bubbleArray[i].bubbleText.x = Math.floor(this._bubbleArray[i].x);
+					this._bubbleArray[i].bubbleText.y = Math.floor(this._bubbleArray[i].y);
 			 	}
-			 	else{
-			 		this._bubbleArray.splice(i, 1)
-			 	};
 			}
 			
 		}
@@ -123,8 +120,8 @@ Bubble.Game.prototype = {
 			// hide all bubbles
 			for (var i = 0; i < this._bubbleArray.length; i++) {
 				if (this._bubbleArray[i] !== null) {
-					this._bubbleArray[i].bubble.kill();
 					this._bubbleArray[i].bubbleText.visible = false;
+					this._bubbleArray[i].kill();					
 				}
 			};
 
@@ -142,8 +139,8 @@ Bubble.Game.prototype = {
 			// show all bubbles
 			for (var i = 0; i < this._bubbleArray.length; i++) {
 				if (this._bubbleArray[i] !== null) {
-					if (!this._bubbleArray[i].bubble.alive) {
-						this._bubbleArray[i].bubble.revive();
+					if (!this._bubbleArray[i].alive) {
+						this._bubbleArray[i].revive();
 						this._bubbleArray[i].bubbleText.visible = true;
 					}
 				}
@@ -204,9 +201,9 @@ Bubble.Game.prototype = {
 			for (var i = 0; i < game._bubbleArray.length; i++) {
 				if (game._bubbleArray[i] !== null) {
 					// rotate every bubble for 3 pixels to left in every frame
-					game._bubbleArray[i].bubble.events.onInputDown.add(game.mouseClick, this);
+					game._bubbleArray[i].events.onInputDown.add(game.mouseClick, this);
 					// check that bubble is inside game
-					game._bubbleArray[i].bubble.events.onOutOfBounds.add(game.gameOver, this);
+					game._bubbleArray[i].events.onOutOfBounds.add(game.gameOver, this);
 			 	}
 			}
 		}
@@ -224,20 +221,18 @@ Bubble.Game.prototype = {
 		// hide all bubbles
 		for (var i = 0; i < this._bubbleArray.length; i++) {
 			if (this._bubbleArray[i] != null) {
-				this._bubbleArray[i].bubble.kill();
 				this._bubbleArray[i].bubbleText.visible = false;
+				this._bubbleArray[i].kill();
 			}
 		};
 	},
 	mouseClick: function(bubble){
 		// collect x and y from bubble
-		var index =  this._bubbleArray.map(function(x) {return x.bubble; }).indexOf(bubble);
-		var object = this._bubbleArray[index];
 		var bubbleX = bubble.x;
 		var bubbleY = bubble.y;
 		// make clicked bubble disappear;
 		bubble.kill();
-		object.bubbleText.visible = false;
+		bubble.bubbleText.visible = false;
 		// create temporary bubble as a "ghost" of the real one
 		var tempBubble = this.game.add.sprite(bubbleX, bubbleY, 'bubbles', 0);
 		tempBubble.alpha = 0.5;
@@ -263,14 +258,18 @@ Bubble.Game.prototype = {
 			for (var i = 0; i < this._bubbleArray.length; i++) {
 				if (this._bubbleArray[i] !== null) {
 					// check the mousepointers location against bubbles in the world when released
-					if (tempBubble.overlap(this._bubbleArray[i].bubble)){
+					if (tempBubble.overlap(this._bubbleArray[i])){
+						// get index of the dragger bubble
+						var index = this._bubbleArray.indexOf(bubble);
+						// create a string from exeption of overlapping bubbles
+						var newNum = this._bubbleArray[i].bubbleText.text + "+(" + bubble.bubbleText.text + ")";
+						this._bubbleArray[i].bubbleText.text = math.eval(newNum);
+						// check if index is there and shorten the array
 						if (index > -1) {
 							this._bubbleArray.splice(index, 1);
+							bubble.bubbleText.destroy();
+							bubble.destroy();		
 						}
-						bubble.destroy();
-						object.bubbleText.destroy();
-						var newNum = "(" + this._bubbleArray[i].bubbleText.text + ")+(" + object.bubbleText.text + ")";
-						this._bubbleArray[i].bubbleText.text = math.eval(newNum);
 						tempBubble.destroy();
 						check = false;
 					}
@@ -279,7 +278,7 @@ Bubble.Game.prototype = {
 			// if no hoovered bubbles founded, release base bubble and remove temporary
 			if (check) {
 				bubble.reset(bubbleX,bubbleY);
-				object.bubbleText.visible = true;
+				bubble.bubbleText.visible = true;
 				tempBubble.destroy();
 			}
 		}, this);
@@ -292,36 +291,34 @@ Bubble.item = {
 	spawnBubble: function(game, sObject) {
 			var x = null;
 			var bubbleType = null;
-			// create object to use with bubble
-			var object = new Object();
 			/*-----------------------------BUBBLE CREATION------------------------------*/
 			// randomize the x-spawning point and bubble type
 			x = game._bubbleSpawnX[game.rnd.integerInRange(0, 5)];
 			bubbleType = game.rnd.integerInRange(0, 2)
 			//spawn new bubble
-			object.bubble = game.add.sprite(x, -50, 'bubbles');
+			bubble = game.add.sprite(x, -50, 'bubbles');
 			// add new animation frame & play it
-			object.bubble.animations.add('anim', [bubbleType], 10, true);
-			object.bubble.animations.play('anim');
+			bubble.animations.add('anim', [bubbleType], 10, true);
+			bubble.animations.play('anim');
 
 			// enable bubble body for physic engine
 			//TODO: SET FALSE TO EXIT DEBUGGING
-			game.physics.p2.enable(object.bubble, true);
-			object.bubble.checkWorldBounds = true;
+			game.physics.p2.enable(bubble, true);
+			bubble.checkWorldBounds = true;
 			// create circular collision and
-			object.bubble.body.setCircle(50);
+			bubble.body.setCircle(50);
 			// some rotation between 1 - 50 pixels
-			object.bubble.body.rotateLeft(game.rnd.integerInRange(1, 50));
+			bubble.body.rotateLeft(game.rnd.integerInRange(1, 50));
 			// add input to bubble
-			object.bubble.inputEnabled = true;
+			bubble.inputEnabled = true;
 			/*-----------------------------TEXT CREATION------------------------------*/
 			// randomize some number from alternative array
 			var number = sObject.altsArray[game.rnd.integerInRange(0, sObject.altsArray.length-1)]
 			var style = { font: "32px Arial", fill: "#ffffff", align: "center" };
-			object.bubbleText = game.add.text(object.bubble.x, object.bubble.y, number, style);
-			object.bubbleText.anchor.set(0.5);
+			bubble.bubbleText = game.add.text(bubble.x, bubble.y, number, style);
+			bubble.bubbleText.anchor.set(0.5);
 			// add object to an array
-			game._bubbleArray.push(object);
+			game._bubbleArray.push(bubble);
 			//play appearing sound
 			game._appearSound.play();
 	}
