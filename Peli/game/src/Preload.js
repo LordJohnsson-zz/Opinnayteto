@@ -31,10 +31,15 @@ Bubble.Preload.prototype = {
         this.load.spritesheet('button-reload','assets/reload.png', 85, 85);
         this.load.spritesheet('button-toMainMenu','assets/backToMenu.png', 85, 85);
         // load audio
-        this.load.audio('bubble_appear', 'assets/bubble2.wav');
-        this.load.audio('buttonClick', 'assets/button-click.wav');
-        this.load.audio('gameOver', 'assets/game-over.wav');
-        this.load.audio('counter', 'assets/counter.wav');
+        this.load.audio('bubble_appear', 'assets/audio/bubble2.ogg');
+        this.load.audio('buttonClick', 'assets/audio/button-click.ogg');
+        this.load.audio('gameOver', 'assets/audio/game-over.ogg');
+        this.load.audio('counter', 'assets/audio/counter.ogg');
+        this.load.audio('bubbleMain', 'assets/audio/bubbles.ogg');
+        this.load.audio('winGame', 'assets/audio/winGame.ogg');
+        this.load.audio('getStar', 'assets/audio/getStar.ogg');
+        this.load.audio('wrongAnswer', 'assets/audio/wrongAnswer.ogg');
+        this.load.audio('mainMenu', 'assets/audio/mainMenu.ogg');
     },
     create: function() {
         this.state.start('MainMenu');

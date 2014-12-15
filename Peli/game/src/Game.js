@@ -35,18 +35,23 @@ Bubble.Game.prototype = {
 		this._spawnBubbleTimer = 0;
 		// add score image & initialize the score text with 0
 		this.add.sprite(0, 0, 'score-bg');
-		this._scoreText = this.add.text(84, 29.5, "0", this._fontStyle);
+		Bubble._scoreText = this.add.text(84, 29.5, "0", this._fontStyle);
 		// initialize sound
 		this._appearSound = this.game.add.audio('bubble_appear');
 		this._buttonSoundClick = this.game.add.audio('buttonClick');
 		this._gameOverSound = this.game.add.audio('gameOver');
 		this._counterSound = this.game.add.audio('counter');
+		this._mainMusic = this.game.add.audio('bubbleMain');
+		this._getStar = this.game.add.audio('getStar');
+		this._winGame = this.game.add.audio('winGame');
+		this._wrongAnswer = this.game.add.audio('wrongAnswer');
 
 		// create new array for bubbles and x -spawning point
 		this._bubbleArray = new Array();
 		
 		// get the first expression
 		this._currentExp = this._setup[this.rnd.integerInRange(0, this._setup.length-1)];
+		this.showExpression(this._currentExp, this);
 
 		// spawn first 5 bubbles with spawn call
 		for (var i = 0; i < 5; i++) {	
@@ -62,7 +67,7 @@ Bubble.Game.prototype = {
 		this.add.existing(this.endPanel);
 
 		this.endPanel.hide();
-
+		this._mainMusic.play("",0,1,true,false);
 		this.playGame();
 	},
 	update: function(){
@@ -85,6 +90,8 @@ Bubble.Game.prototype = {
 					this._bubbleArray[i].bubbleText.y = Math.floor(this._bubbleArray[i].y);
 			 	}
 			}
+
+			this.showExpression(this._currentExp, this.game);
 			
 		}
 	},
@@ -100,9 +107,13 @@ Bubble.Game.prototype = {
 		this._bubbleSpawnX = [0,100,200,300,400,500];
 		this._paused = true;
 		this.btnPause = null;
+		// define game setup & expression variables
 		this._ville = null;
 		this._setup = null;
 		this._currentExp = null;
+		this._expSolved = true;
+		this._txtExpression = null;
+		this._answerNum = null;
 		// define Bubble variables to reuse them in Bubble.item functions
 		Bubble._scoreText = null;
 		Bubble._score = 0;
@@ -115,6 +126,8 @@ Bubble.Game.prototype = {
 			// stop the game
 			this._paused = true;
 			this.btnPause.visible = false;
+			this._txtExpression.visible = false;
+			this._mainMusic.pause();
 			// show pause menu
 			this.pausePanel.show();
 			// hide all bubbles
@@ -134,6 +147,7 @@ Bubble.Game.prototype = {
 			//set game running again
 			this._paused = false;
 			this.btnPause.visible = true;
+			this._txtExpression.visible = true;
 			// hide pause menu
 			this.pausePanel.hide();
 			// show all bubbles
@@ -148,6 +162,9 @@ Bubble.Game.prototype = {
 
 			// return ville's idle-animation
 			this._ville.animations.play('idle');
+			if (this._mainMusic.paused) {
+				this._mainMusic.resume();
+			}
 		}
 	},
 	// start game counter
@@ -200,12 +217,91 @@ Bubble.Game.prototype = {
 			// add events to bubble
 			for (var i = 0; i < game._bubbleArray.length; i++) {
 				if (game._bubbleArray[i] !== null) {
-					// rotate every bubble for 3 pixels to left in every frame
+					// create dragable sprite from the bubble
 					game._bubbleArray[i].events.onInputDown.add(game.mouseClick, this);
 					// check that bubble is inside game
 					game._bubbleArray[i].events.onOutOfBounds.add(game.gameOver, this);
 			 	}
 			}
+		}
+	},
+	// print out the current expression to be solved
+	showExpression: function(sObject, game){
+		// expression is solved
+		if (this._expSolved) {
+			var style = SetFontStyleExpression();
+			var txt = "";
+			// randomize what number to hide
+			var hidNum = game.rnd.integerInRange(0, sObject.expArray.length-1)
+			// loop and print expression numbers and operators
+			for (var i = 0; i < sObject.expArray.length; i++) {
+				// if random number and array index matches
+				if (i==hidNum) {
+					// if index is same as operator
+					if (sObject.expArray[i] == "+" || sObject.expArray[i] == "-" || sObject.expArray[i] == "*" 
+						|| sObject.expArray[i] == "/" || sObject.expArray[i] == "="){
+							// print operator
+							txt += sObject.expArray[i]
+							// add next number to be hidden
+							hidNum += 1;
+							// add spacing if nessasary
+							if (i!=sObject.expArray.length-1) {
+								txt += " ";
+							}
+					}
+					// if not, add answer to variable and hide number from expression 
+					else{
+						this._answerNum = sObject.expArray[i];
+						txt += "? ";
+					}
+				}
+				// print number out normally
+				else{
+					txt += sObject.expArray[i];
+					if (i!=sObject.expArray.length-1) {
+						txt += " ";
+					}
+				}
+				
+			};
+			// finally, print out whole expression wit hidden number
+			this._txtExpression = game.add.text(130, 685, txt, style);
+			this._expSolved = false;
+		}
+	},
+	// show new expression
+	newExpression: function(){
+		// create new expression
+		var index = this._setup.indexOf(this._currentExp);
+		this._setup.splice(index, 1);
+		if (this._setup.length<1) {
+			this.gameOver();
+		}
+		else{
+			this._txtExpression.destroy();
+			this._currentExp = null;
+			this._currentExp = this._setup[this.rnd.integerInRange(0, this._setup.length-1)];
+			this._expSolved = true;
+		}
+	},
+	// check if the answer is correct
+	checkAnswer: function(sObject, bubble, game){
+		// if text in bubble and hidden number matches
+		if (bubble.bubbleText.text == this._answerNum) {
+			// give player a score and play a sound
+			Bubble._score += 1;
+			Bubble._scoreText.text = Bubble._score;
+			this._getStar.play();
+			var style = SetFontStyleExpression();
+			// show the whole expression
+			this._txtExpression.text = sObject.expression;
+			this._expSolved = true;
+			return true;
+		}
+		// answer incorrect: play sound
+		else{
+			this._wrongAnswer.play();
+			return false;
 		}
 	},
 	// to end game
@@ -214,6 +310,8 @@ Bubble.Game.prototype = {
 		this._gameOverSound.play();
 		// when game over, pause game
 		this._paused = true;
+		// stop the main music
+		this._mainMusic.stop();
 		// hide extra buttons
 		this.btnPause.visible = false;
 		// show game over panel
@@ -230,6 +328,7 @@ Bubble.Game.prototype = {
 		// collect x and y from bubble
 		var bubbleX = bubble.x;
 		var bubbleY = bubble.y;
+		var dragged = false;
 		// make clicked bubble disappear;
 		bubble.kill();
 		bubble.bubbleText.visible = false;
@@ -246,10 +345,26 @@ Bubble.Game.prototype = {
 		this.game.time.events.add(150, function() {
 			// check if mouse is still pressed down
 			if (this.game.input.activePointer.isDown) {
-				// makes temporary bubble moveable
-				tempBubble.input.startDrag(this.game.input.activePointer);
+					// makes temporary bubble moveable
+					tempBubble.input.startDrag(this.game.input.activePointer);
 			}
-
+			// if it was just a click
+			else{
+				// if the answer is true
+				if (this.checkAnswer(this._currentExp, bubble, this.game)) {
+					var index = this._bubbleArray.indexOf(bubble);
+					this._bubbleArray.splice(index, 1);
+					bubble.bubbleText.destroy();
+					bubble.destroy();
+					tempBubble.destroy();
+					this.newExpression();
+				}
+				else{
+					bubble.reset(bubbleX,bubbleY);
+					bubble.bubbleText.visible = true;
+					tempBubble.destroy();
+				}
+			}
 		}, this);
 
 		tempBubble.events.onDragStop.add(function(){
@@ -282,7 +397,6 @@ Bubble.Game.prototype = {
 				tempBubble.destroy();
 			}
 		}, this);
-		
 	}
 
 };
@@ -313,8 +427,8 @@ Bubble.item = {
 			bubble.inputEnabled = true;
 			/*-----------------------------TEXT CREATION------------------------------*/
 			// randomize some number from alternative array
-			var number = sObject.altsArray[game.rnd.integerInRange(0, sObject.altsArray.length-1)]
-			var style = { font: "32px Arial", fill: "#ffffff", align: "center" };
+			var number = game.rnd.integerInRange(-game._answerNum, game._answerNum);
+			var style = SetFontStyleBubble();
 			bubble.bubbleText = game.add.text(bubble.x, bubble.y, number, style);
 			bubble.bubbleText.anchor.set(0.5);
 			// add object to an array
