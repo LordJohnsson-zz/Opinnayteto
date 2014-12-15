@@ -36,8 +36,8 @@ var Setup = {
     		// case of plus operator
 		    case 0:
 		    	// randomize numbers for expression
-		        var n1 = game.rnd.integerInRange(1, 100);
-				var n2 = game.rnd.integerInRange(1, 100);
+		        var n1 = game.rnd.integerInRange(1, 50);
+				var n2 = game.rnd.integerInRange(1, 50);
 				// add numbers to array
 				tempArray.push(n1);
 				tempArray.push("+");
@@ -47,9 +47,12 @@ var Setup = {
 		    case 1:
 		    	// randomize numbers for expression
 		        var n1 = game.rnd.integerInRange(1, 100);
-				var n2 = game.rnd.integerInRange(1, 100);
+				var n2 = game.rnd.integerInRange(1, 99);
+				// prevent zero calculations
+				if (n1==n2) {
+					n1 +=1;
+				};
 				// add numbers to array
-				
 				tempArray.push("-");
 				tempArray.push(n2);
 
@@ -86,8 +89,8 @@ var Setup = {
 		    // back-up if something fails
 		    default: 
 		        // randomize numbers for expression
-		        var n1 = game.rnd.integerInRange(1, 100);
-				var n2 = game.rnd.integerInRange(1, 100);
+		        var n1 = game.rnd.integerInRange(1, 50);
+				var n2 = game.rnd.integerInRange(1, 50);
 				// add numbers to array
 				tempArray.push(n1);
 				tempArray.push("+");
@@ -131,7 +134,7 @@ var Setup = {
 			}
 			// otherwise get numbers accoridng to answer only 
 			else{
-				tempArray.push(game.rnd.integerInRange((array[array.length-1]-15), (array[array.length-1]+15)));
+				tempArray.push(game.rnd.integerInRange(-array[array.length-1], array[array.length-1]));
 			}
 			if (i == (randomInt*5)-1) {
 				tempArray.push(array[array.length-1]);

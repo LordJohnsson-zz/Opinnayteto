@@ -65,13 +65,15 @@ Bubble.Game.prototype = {
 		this.add.existing(this.pausePanel);
 		this.endPanel = new GameOverPanel(this.game);
 		this.add.existing(this.endPanel);
+		this.winPanel = new GameWonPanel(this.game);
+		this.add.existing(this.winPanel);
 
 		this.endPanel.hide();
+		this.winPanel.hide();
 		this._mainMusic.play("",0,1,true,false);
 		this.playGame();
 	},
 	update: function(){
-
 		// check that game is not paused
 		if (!this._paused){
 
@@ -90,9 +92,7 @@ Bubble.Game.prototype = {
 					this._bubbleArray[i].bubbleText.y = Math.floor(this._bubbleArray[i].y);
 			 	}
 			}
-
 			this.showExpression(this._currentExp, this.game);
-			
 		}
 	},
 	// set variables
@@ -213,7 +213,6 @@ Bubble.Game.prototype = {
 				// call the spawner for bubbles
 				Bubble.item.spawnBubble(game, this._currentExp);
 			}
-
 			// add events to bubble
 			for (var i = 0; i < game._bubbleArray.length; i++) {
 				if (game._bubbleArray[i] !== null) {
@@ -275,7 +274,12 @@ Bubble.Game.prototype = {
 		var index = this._setup.indexOf(this._currentExp);
 		this._setup.splice(index, 1);
 		if (this._setup.length<1) {
-			this.gameOver();
+			if (Bubble._score==10) {
+				this.gameWon();
+			}
+			else{
+				this.gameOver();
+			}
 		}
 		else{
 			this._txtExpression.destroy();
@@ -306,16 +310,35 @@ Bubble.Game.prototype = {
 	},
 	// to end game
 	gameOver: function(){
+		// stop the main music
+		this._mainMusic.stop();
 		// play game over sound
 		this._gameOverSound.play();
 		// when game over, pause game
 		this._paused = true;
-		// stop the main music
-		this._mainMusic.stop();
 		// hide extra buttons
 		this.btnPause.visible = false;
 		// show game over panel
 		this.endPanel.show();
+		// hide all bubbles
+		for (var i = 0; i < this._bubbleArray.length; i++) {
+			if (this._bubbleArray[i] != null) {
+				this._bubbleArray[i].bubbleText.visible = false;
+				this._bubbleArray[i].kill();
+			}
+		};
+	},
+	gameWon: function(){
+		// stop the main music
+		this._mainMusic.stop();
+		// play game over sound
+		this._winGame.play();
+		// when game over, pause game
+		this._paused = true;
+		// hide extra buttons
+		this.btnPause.visible = false;
+		// show game over panel
+		this.winPanel.show();
 		// hide all bubbles
 		for (var i = 0; i < this._bubbleArray.length; i++) {
 			if (this._bubbleArray[i] != null) {
@@ -428,6 +451,9 @@ Bubble.item = {
 			/*-----------------------------TEXT CREATION------------------------------*/
 			// randomize some number from alternative array
 			var number = game.rnd.integerInRange(-game._answerNum, game._answerNum);
+			if (number == 0) {
+				number += 1;
+			};
 			var style = SetFontStyleBubble();
 			bubble.bubbleText = game.add.text(bubble.x, bubble.y, number, style);
 			bubble.bubbleText.anchor.set(0.5);
