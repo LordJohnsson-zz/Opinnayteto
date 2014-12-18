@@ -23,13 +23,17 @@ Bubble.Preload.prototype = {
         this.load.image('pauseMenu', 'assets/pauseMenu.png');
         this.load.image('answerBubble', 'assets/Bubble2.png');
         // load spritesheets
-        this.load.spritesheet('bubbles', 'assets/Bubbles.png', 100, 100);
-        this.load.spritesheet('monster-idle','assets/monster-idle.png', 103, 131);
+        this.load.spritesheet('bubblesBlue', 'assets/Bubbles.png', 100, 100);
+        this.load.spritesheet('bubblesRed', 'assets/Bubbles2.png', 100, 100);
+        this.load.spritesheet('bubblesGreen', 'assets/Bubbles3.png', 100, 100);
+        this.load.spritesheet('bubblesViolet', 'assets/Bubbles4.png', 100, 100);
+        this.load.spritesheet('ville-idle','assets/ville_idle.png', 102, 191);
         this.load.spritesheet('button-start','assets/start_button.png', 106, 106);
         this.load.spritesheet('button-pause','assets/pause_button.png', 100, 100);
         this.load.spritesheet('button-continue','assets/continue.png', 85, 85);
         this.load.spritesheet('button-reload','assets/reload.png', 85, 85);
         this.load.spritesheet('button-toMainMenu','assets/backToMenu.png', 85, 85);
+        this.load.spritesheet('ville_hp', 'assets/ville_robot_hp.png', 32, 60);
         // load audio
         this.load.audio('bubble_appear', 'assets/audio/bubble2.ogg');
         this.load.audio('buttonClick', 'assets/audio/button-click.ogg');

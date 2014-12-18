@@ -29,7 +29,7 @@ function SetFontStyleLarge(){
 
 function SetFontStyleExpression(){
 	this.txtExp = {
-		font: "32px Arial",
+		font: "46px Arial",
 		fill: "#FFFFFF", 
 		stroke: "#333", 
 		strokeThickness: 5, 
