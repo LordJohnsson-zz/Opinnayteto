@@ -10,30 +10,12 @@ var Setup = {
 		object.joinOperator = "addition";
 		object.playerHP = 5;
     	object.arrayOfExpressions = new Array();
-    	object.bubbleColor;
     	// create random expressions for the object
         for (var i = 0; i < 10; i++) {
         	// create expression object 
         	var formula = new Object();
         	// create array for the expression elements
         	formula.expArray = new Array();
-			// get the number used in the expression according to the join operator
-         	if (object.joinOperator == "addition") {
-         		operator = 0;
-         		object.bubbleColor = "bubblesGreen";
-			}
-			/*else if (object.joinOperator == "subtraction") {
-				operator = 1;
-				object.bubbleColor = "bubblesRed";
-			}
-			else if (object.joinOperator == "multiply") {
-				operator = 2;
-				object.bubbleColor = "bubblesBlue";
-			}
-			else if (object.joinOperator == "divide") {
-				operator = 3;
-				object.bubbleColor = "bubblesViolet";
-			}*/
         	// add expression elements to the array
         	formula.expArray = this.getExpression(game.rnd.integerInRange(0, 3), game);
 			// add expression as a string to object

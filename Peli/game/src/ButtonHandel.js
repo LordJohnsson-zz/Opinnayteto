@@ -3,22 +3,35 @@
 // In-game pause -menu
 var PausePanel = function(game, parent){
 	Phaser.Group.call(this,game,parent);
-	var buttonSoundClick = game.add.audio('buttonClick');
 	var panelX = (Bubble.GAME_WIDTH/2)-147;
-
+	var buttonSoundClick = game.add.audio('buttonClick');
+	
 	// create in-game menu board
 	this.panel = this.create(panelX, 50, 'pauseMenu');
 	this.panel.anchor.setTo(0.5, 0);
 	
-	// resume game -button
-	this.btnPlay = this.game.add.button(panelX-150, 120, 'button-continue', function(){
+	// create settings menu
+	this.settings = new SettingsPanel(game,(this.panel.y+this.panel.height-3));
+	game.add.existing(this.settings);
+	this.settings.visible = false;
+	this.settings.btnSounds.visible = false;
+
+	this.btnSetup = this.game.add.button(panelX-150, 120, 'button-setup', function(){
 		// add sound effect to onClick
 		buttonSoundClick.play();
-		// return to play the current state
-		this.game.state.getCurrentState().playGame();
-	}, this,0,0,1);
+		// show settings menu
+		if (!this.settings.visible){
+			this.settings.visible = true;
+			this.settings.btnSounds.visible = true;
+		}
+		else{
+			this.settings.visible = false;
+			this.settings.btnSounds.visible = false;
+
+		}
+	}, this,0,0,1)
 	// add button to in-game menu
-	this.add(this.btnPlay);
+	this.add(this.btnSetup);
 
 	// restart game -button
 	this.btnReload = this.game.add.button(panelX-45, 120, 'button-reload', function(){
@@ -116,4 +129,42 @@ GameWonPanel.prototype.show = function(){
 };
 GameWonPanel.prototype.hide = function(){
 	this.game.add.tween(this).to({y:-400}, 200, Phaser.Easing.Linear.NONE, true);
+};
+
+// In-game winning menu
+var SettingsPanel = function(game,panelY, parent){
+	Phaser.Group.call(this,game,parent);
+	var buttonSoundClick = game.add.audio('buttonClick');
+	var infoFont = SetFontStyleExpression();
+	this.infoText = game.add.text(game.world.centerX-200, game.world.centerY-50, "TestiäTestiä", infoFont);
+	this.infoText.visible = false;
+	// Game won panel
+	this.panel = this.create((Bubble.GAME_WIDTH/2)-145, panelY, 'settings');
+
+	this.btnSounds = game.add.sprite(this.panel.x, this.panel.y+15, 'button-soundOn', 0);
+	this.btnSounds.inputEnabled = true;
+	this.btnSounds.events.onInputDown.add(this.musicSet, this);
+	this.btnInfo = this.game.add.button(this.panel.x, this.btnSounds.y+85, 'button-info', function(){
+		buttonSoundClick.play();
+		if (!this.infoText.visible) {
+			this.infoText.visible = true;
+		}
+		else{
+			this.infoText.visible = false;
+		}
+	}, this,0,0,0);
+	this.add(this.btnInfo);
+};
+
+SettingsPanel.prototype = Object.create(Phaser.Group.prototype);
+SettingsPanel.constructor = SettingsPanel;
+
+SettingsPanel.prototype.musicSet = function(game){
+	if (true) {};
+	if (this.btnSounds.key=="button-soundOn"){
+		this.btnSounds.loadTexture("button-soundOff");
+	}
+	else{
+		this.btnSounds.loadTexture("button-soundOn");
+	}
 };

@@ -13,6 +13,7 @@ Bubble.MainMenu.prototype = {
     },
     startGame: function() {
         this._mainMenu.stop();
+        this._mainMenu.destroy();
         this._buttonSoundClick.play();
         // start the Game state
         this.state.start('Game');

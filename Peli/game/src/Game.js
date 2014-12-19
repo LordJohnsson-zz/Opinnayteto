@@ -44,9 +44,18 @@ Bubble.Game.prototype = {
 		
 		// initialize the spawn timer
 		this._spawnBubbleTimer = 0;
-		// add score image & initialize the score text with 0
-		this.add.sprite(0, 0, 'score-bg');
-		Bubble._scoreText = this.add.text(84, 29.5, "0", this._fontStyle);
+		// add score image & initialize the score text
+		this._scoreArray = new Array();
+		for (var i = 0; i < 10; i++) {
+			if (i==0) {
+				this._scoreArray.push(this.add.sprite(0, 0, 'score_star'));
+				this._scoreArray[i].alpha -= 0.5;
+			}
+			else{
+				this._scoreArray.push(this.add.sprite((this._scoreArray[i-1].x+44), 0, 'score_star'));
+				this._scoreArray[i].alpha -= 0.5;
+			}	
+		};
 		// initialize sound
 		this._appearSound = this.game.add.audio('bubble_appear');
 		this._buttonSoundClick = this.game.add.audio('buttonClick');
@@ -64,15 +73,30 @@ Bubble.Game.prototype = {
 		this._currentExp = this._setup.arrayOfExpressions[this.rnd.integerInRange(0, this._setup.arrayOfExpressions.length-1)];
 		this.showExpression(this._currentExp, this);
 
+		// get the color of the bubbles according to joinOperator
+        if (this._setup.joinOperator == "addition") {
+     		this._bubbleColor = "bubblesGreen";
+     		this._createBubbleColor = "createGreen";
+		}
+		else if (this._setup.joinOperator == "subtraction") {
+			this._bubbleColor = "bubblesRed";
+			this._createBubbleColor = "createRed";
+		}
+		else if (this._setup.joinOperator == "multiply") {
+			this._bubbleColor = "bubblesBlue";
+			this._createBubbleColor = "createBlue";
+		}
+		else if (this._setup.joinOperator == "divide") {
+			this._bubbleColor = "bubblesViolet";
+			this._createBubbleColor = "createViolet";
+		}
 		// spawn first 5 bubbles with spawn call
-		for (var i = 0; i < 5; i++) {	
-			Bubble.item.spawnBubble(this, this._currentExp, this._setup,null);
+		for (var i = 0; i < 5; i++) {
+			Bubble.item.spawnBubble(this, this._bubbleSpawnX[this.game.rnd.integerInRange(0, 5)], this._currentExp, this._setup,null);
 			// create dragable sprite from the bubble
 			this._bubbleArray[i].events.onInputDown.add(this.mouseClick, this);
 		};
 
-		// add pause button
-		this.btnPause = this.add.button(Bubble.GAME_WIDTH-125, Bubble.GAME_HEIGHT-150, 'button-pause', this.pauseGame, this, 0,0,1);
 		// add in-game menu panels
 		this.pausePanel = new PausePanel(this.game);
 		this.add.existing(this.pausePanel);
@@ -81,15 +105,29 @@ Bubble.Game.prototype = {
 		this.winPanel = new GameWonPanel(this.game);
 		this.add.existing(this.winPanel);
 
+		// pause game -button
+		this.btnPause = this.add.button(Bubble.GAME_WIDTH-125, Bubble.GAME_HEIGHT-150, 'button-pause', this.pauseGame, this, 0,0,1);
+		// resume game -button
+		this.btnPlay = this.add.button(Bubble.GAME_WIDTH-125, Bubble.GAME_HEIGHT-150, 'button-continue', function(){
+			// add sound effect to onClick
+			this._buttonSoundClick.play();
+			this.pausePanel.settings.visible = false;
+			this.pausePanel.settings.btnSounds.visible = false;
+			// return to play the current game
+			this.playGame();
+		}, this,0,0,1);
+
 		this.endPanel.hide();
 		this.winPanel.hide();
 		this._mainMusic.play("",0,1,true,false);
 		this.playGame();
+		
 	},
 	// set variables
 	setVariables: function(){
 		// define variables for Bubble.Game
 		this._spawnBubbleTimer = 0;
+		this._expressionTimer = 0;
 		this._start = true;
 		this._counter = 5;
 		this._counterText = "";
@@ -98,6 +136,8 @@ Bubble.Game.prototype = {
 		this._bubbleSpawnX = [0,100,200,300,400,500];
 		this._paused = true;
 		this.btnPause = null;
+		this.btnPlay = null;
+		this._createBubble = null;
 		// define game setup & expression variables
 		this._ville = null;
 		this._setup = null;
@@ -109,7 +149,6 @@ Bubble.Game.prototype = {
 		this._playerHp = 0;
 		this._tempCalculationText = "";
 		// define Bubble variables to reuse them in Bubble.item functions
-		Bubble._scoreText = null;
 		Bubble._score = 0;
 	},
 	update: function(){
@@ -121,30 +160,70 @@ Bubble.Game.prototype = {
 			// function for game start counter
 			this.startCounter(this);
 			// main game function
-			this.createBubbles(this);
+			if (!this._start){
 
+				if (this._bubbleArray.length >= 5) {};
+
+				// if spawn timer reach time given from setup (1 sec = 1000 milliseconds)
+				if(this._spawnBubbleTimer > (this._setup.dropTime*1000)) {
+					// if game screen has reached it's limits
+					if (this._bubbleArray.length > 36) {
+						this.gameOver();
+					}
+					else{
+						// reset it
+						this._spawnBubbleTimer = 0;
+						// play spawning for bubble
+						//this.createBubbles(this);
+						Bubble.item.spawnBubble(this, this._bubbleSpawnX[this.game.rnd.integerInRange(0, 5)], this._currentExp, this._setup,null);
+					}
+				}
+				// add events to bubble
+				for (var i = 0; i < this._bubbleArray.length; i++) {
+						// create dragable sprite from the bubble
+						this._bubbleArray[i].events.onInputDown.add(this.mouseClick, this);
+						// check that bubble is inside game
+						//this._bubbleArray[i].events.onOutOfBounds.add(this.gameOver, this);
+				}
+				if (this._createBubble!=null) {
+					if (!this._createBubble.alive) {
+						this._createBubble.destroy();
+						// call the spawner for bubbles
+						Bubble.item.spawnBubble(this, this._createBubbleX, this._currentExp, this._setup,null);
+						this._createBubble = null;
+					}
+				}
+				// expression is solved
+				if (this._expSolved) {
+					this._expressionTimer += this.time.elapsed;
+					// show the right answer for certain amount of time
+					if (this._expressionTimer>5000) {
+						// create a new expression
+						this.newExpression();
+						// print out the expression
+						this.showExpression(this._currentExp, this);
+						// reset timer
+						this._expressionTimer = 0;
+					}
+				};
+			}
 			// add event to bubble text
 			for (var i = 0; i < this._bubbleArray.length; i++) {
-				if (this._bubbleArray[i] !== null) {
 					// move text according to bubble positions
 					this._bubbleArray[i].bubbleText.x = Math.floor(this._bubbleArray[i].x);
 					this._bubbleArray[i].bubbleText.y = Math.floor(this._bubbleArray[i].y);
-			 	}
 			}
-			// print out the current expression
-			this.showExpression(this._currentExp, this.game);
 			// check the player health
-			if (this._playerHp<= 0) {
+			if (this._playerHp< 0) {
 				this.gameOver();
 			}
 			// floating number over bubble
 			if (this._tempCalculationText!="") {
 
 				// make it rise and fade
-				this._tempCalculationText.y -= 10;
-				this._tempCalculationText.alpha -= 0.01;
+				this._tempCalculationText.y -= 2;
+				this._tempCalculationText.alpha -= 0.005;
 			}
-
 		}
 	},
 	// function for handling game pause
@@ -155,16 +234,15 @@ Bubble.Game.prototype = {
 			// stop the game
 			this._paused = true;
 			this.btnPause.visible = false;
+			this.btnPlay.visible = true;
 			this._txtExpression.visible = false;
 			this._mainMusic.pause();
 			// show pause menu
 			this.pausePanel.show();
 			// hide all bubbles
 			for (var i = 0; i < this._bubbleArray.length; i++) {
-				if (this._bubbleArray[i] !== null) {
 					this._bubbleArray[i].bubbleText.visible = false;
-					this._bubbleArray[i].kill();					
-				}
+					this._bubbleArray[i].kill();
 			};
 
 			// stop ville's idle-animation
@@ -176,17 +254,16 @@ Bubble.Game.prototype = {
 			//set game running again
 			this._paused = false;
 			this.btnPause.visible = true;
+			this.btnPlay.visible = false;
 			this._txtExpression.visible = true;
 			// hide pause menu
 			this.pausePanel.hide();
 			// show all bubbles
 			for (var i = 0; i < this._bubbleArray.length; i++) {
-				if (this._bubbleArray[i] !== null) {
 					if (!this._bubbleArray[i].alive) {
 						this._bubbleArray[i].revive();
 						this._bubbleArray[i].bubbleText.visible = true;
 					}
-				}
 			};
 
 			// return ville's idle-animation
@@ -232,37 +309,14 @@ Bubble.Game.prototype = {
 		}
 	},
 	createBubbles: function(game){
-		// start game itself
-		if (!game._start){
-
-			// if spawn timer reach time given from setup (1 sec = 1000 milliseconds)
-			if(game._spawnBubbleTimer > (this._setup.dropTime*1000)) {
-				// if game screen has reached it's limits
-				if (this._bubbleArray.length > 36) {
-					this.gameOver();
-				}
-				else{
-					// reset it
-					game._spawnBubbleTimer = 0;
-					// call the spawner for bubbles
-					Bubble.item.spawnBubble(game, this._currentExp, this._setup,null);
-				}
-			}
-			// add events to bubble
-			for (var i = 0; i < game._bubbleArray.length; i++) {
-				if (game._bubbleArray[i] !== null) {
-					// create dragable sprite from the bubble
-					game._bubbleArray[i].events.onInputDown.add(game.mouseClick, this);
-					// check that bubble is inside game
-					//game._bubbleArray[i].events.onOutOfBounds.add(game.gameOver, this);
-			 	}
-			}
-		}
+		// play spwaning animation at the beginning of the bubble creation
+		this._createBubbleX = this._bubbleSpawnX[game.rnd.integerInRange(0, 5)];
+		this._createBubble = this.add.sprite(this._createBubbleX, 0, this._createBubbleColor);
+		this._createBubble.animations.add('create');
+		this._createBubble.animations.play('create',5,false,true);
 	},
 	// print out the current expression to be solved
 	showExpression: function(sObject, game){
-		// expression is solved
-		if (this._expSolved) {
 			var style = SetFontStyleExpression();
 			var txt = "";
 			// randomize what number to hide
@@ -299,9 +353,8 @@ Bubble.Game.prototype = {
 				
 			};
 			// finally, print out whole expression wit hidden number
-			this._txtExpression = game.add.text(160, 685, txt, style);
+			this._txtExpression = game.add.text(170, 675, txt, style);
 			this._expSolved = false;
-		}
 	},
 	// show new expression
 	newExpression: function(){
@@ -328,9 +381,9 @@ Bubble.Game.prototype = {
 		// if text in bubble and hidden number matches
 		if (bubble.bubbleText.text == this._answerNum) {
 			// give player a score and play a sound
-			Bubble._score += 1;
-			Bubble._scoreText.text = Bubble._score;
+			this._scoreArray[Bubble._score].alpha += 0.5;
 			this._getStar.play();
+			Bubble._score += 1;
 			var style = SetFontStyleExpression();
 			// show the whole expression
 			this._txtExpression.text = sObject.expression;
@@ -339,15 +392,12 @@ Bubble.Game.prototype = {
 		}
 		// answer incorrect: play sound
 		else{
+			// play sound
 			this._wrongAnswer.play();
-			this._playerHp -= 0.5;
-			var sprite = this._villeArray[this._villeArray.length-1];
-			sprite.alpha -= 0.5;
-			if (sprite.alpha == 0) {
-				var index = this._villeArray.indexOf(sprite);
-				this._villeArray.splice(index, 1);
-				sprite.destroy();
-			}
+			// take life away from the player
+			this._playerHp -= 1;
+			// show taken life as transparent to player
+			this._villeArray[this._playerHp].alpha -= 0.5;
 			return false;
 		}
 	},
@@ -402,7 +452,7 @@ Bubble.Game.prototype = {
 		bubble.kill();
 		bubble.bubbleText.visible = false;
 		// create temporary bubble as a "ghost" of the real one
-		var tempBubble = this.game.add.sprite(bubbleX, bubbleY, this._setup.bubbleColor, 0);
+		var tempBubble = this.game.add.sprite(bubbleX, bubbleY, this._bubbleColor, 0);
 		tempBubble.alpha = 0.5;
 		tempBubble.scale.set(0.8);
 		tempBubble.anchor.setTo(0.5);
@@ -441,15 +491,23 @@ Bubble.Game.prototype = {
 		// create variable for overalpping bubble
 		var overlapBubbleIndex;
 		tempBubble.events.onDragStop.add(function(){
+			// when giving an answer
 			if (tempBubble.overlap(this._floor)) {
-				// if the answer is true
-				if (this.checkAnswer(this._currentExp, bubble, this.game)) {
-					var index = this._bubbleArray.indexOf(bubble);
-					this._bubbleArray.splice(index, 1);
-					bubble.bubbleText.destroy();
-					bubble.destroy();
-					tempBubble.destroy();
-					this.newExpression();
+				// able to give answers only when expression is not solved
+				if (!this._expSolved) {
+					// if the answer is true
+					if (this.checkAnswer(this._currentExp, bubble, this.game)) {
+						var index = this._bubbleArray.indexOf(bubble);
+						this._bubbleArray.splice(index, 1);
+						bubble.bubbleText.destroy();
+						bubble.destroy();
+						tempBubble.destroy();
+					}
+					else{
+						bubble.reset(bubbleX,bubbleY);
+						bubble.bubbleText.visible = true;
+						tempBubble.destroy();
+					}
 				}
 				else{
 					bubble.reset(bubbleX,bubbleY);
@@ -461,37 +519,35 @@ Bubble.Game.prototype = {
 				var check = false;
 				
 				var center;
-				var oldCenter;
+				var oldCenter = 0;
 				// get index of the dragger bubble
 				var index = this._bubbleArray.indexOf(bubble);
 				// loop through all the bubbles in the world
 				for (var i = 0; i < this._bubbleArray.length; i++) {
-					if (this._bubbleArray[i] !== null && i != index) {
-						// calculate distance between two object	
-						center = Phaser.Point.distance(tempBubble, this._bubbleArray[i]);
-						if (i==0){
-							oldCenter = center;
-							overlapBubbleIndex = 0;
-						}
+					if (i !== index) {
 						// check the mousepointers location against bubbles in the world when released
 						if (tempBubble.overlap(this._bubbleArray[i])){
+							// calculate distance between two object	
+							center = Phaser.Point.distance(tempBubble, this._bubbleArray[i]);
 							// get the overlapped bubble which is closest to the temporary bubble
-							if (center<oldCenter) {
+							if(oldCenter==0){
 								oldCenter = center;
 								overlapBubbleIndex = i;
-							};
+							}
+							else if (center<oldCenter) {
+								oldCenter = center;
+								overlapBubbleIndex = i;
+							}
 							check = true;
 						}
 					}
 				};
 
 				// if no hoovered bubbles founded, release base bubble and remove temporary
-				if (!check) {
-					bubble.reset(bubbleX,bubbleY);
-					bubble.bubbleText.visible = true;
-					tempBubble.destroy();
-				}
-				else{
+				if (check) {
+					if (this._tempCalculationText!="") {
+						this._tempCalculationText.destroy();
+					}
 					// create a string from exeption of overlapping bubbles
 					var newNum = this._bubbleArray[overlapBubbleIndex].bubbleText.text + this.bubbleJoin(this._setup) + bubble.bubbleText.text;
 					this._bubbleArray[overlapBubbleIndex].bubbleText.text = math.eval(newNum);
@@ -509,6 +565,11 @@ Bubble.Game.prototype = {
 					// destroy the temporary bubble from the game
 					tempBubble.destroy();
 				}
+				else{
+					bubble.reset(bubbleX,bubbleY);
+					bubble.bubbleText.visible = true;
+					tempBubble.destroy();
+				}
 			}
 		}, this);
 	},
@@ -520,33 +581,33 @@ Bubble.Game.prototype = {
 		else if (setup.joinOperator=="subtraction") {
 			return "-";
 		}
-		else if (setup.joinOperator=="multiply") {
-			return "*";
-		}
-		else if (setup.joinOperator=="divide") {
-			return "/";
+		// else if (setup.joinOperator=="multiply") {
+		// 	return "*";
+		// }
+		// else if (setup.joinOperator=="divide") {
+		// 	return "/";
+		// }
+		else{
+			return "+";
 		}
 	}
 
 };
 Bubble.item = {
 	// Spawn single bubble with text to the world
-	spawnBubble: function(game, sObject, setup, bObject) {
-			var x = null;
-			var bubbleType = null;
+	spawnBubble: function(game, x, sObject, setup, bObject) {
 			/*-----------------------------BUBBLE CREATION------------------------------*/
-			// randomize the x-spawning point and bubble type
-			x = game._bubbleSpawnX[game.rnd.integerInRange(0, 5)];
+			var bubbleType = null;
 			bubbleType = game.rnd.integerInRange(0, 2)
 			//spawn new bubble
 			/*if (bObject!=null) {
 				// spawn smaller bubbles if splitting bubble
-				bubble = game.add.sprite(x, 0, game._setup.bubbleColor);
+				bubble = game.add.sprite(x, 0, game._bubbleColor);
 				bubble.scale.set(0.8);
 				bubble.isDublicate = true;
 			}
 			else{*/
-				bubble = game.add.sprite(x, -50, game._setup.bubbleColor);
+				bubble = game.add.sprite(x, -50, game._bubbleColor);
 				bubble.isDublicate = false;
 			//}
 			// add new animation frame & play it
@@ -604,7 +665,7 @@ Bubble.item = {
 				number -= 1;
 			}
 			return number;
-		}
+		}/*
 		// during multiply
 		else if (setup.joinOperator=="multiply") {
 			// generate random number between 1 and one lesser than answer
@@ -616,6 +677,12 @@ Bubble.item = {
 			// generate random number between numbers in the array
 			var tempArray = [2,3,5,10,(game._answerNum*(game.rnd.integerInRange(1,12)))]
 			number = tempArray[game.rnd.integerInRange(0,tempArray.length-1)];
+			return number;
+		}*/
+		// if command unknown, use addition as default 
+		else{
+			// generate random number between 1 and one lesser than answer
+			number = game.rnd.integerInRange(1, game._answerNum-1);
 			return number;
 		}
 	}
