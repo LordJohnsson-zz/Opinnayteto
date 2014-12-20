@@ -93,8 +93,6 @@ Bubble.Game.prototype = {
 		// spawn first 5 bubbles with spawn call
 		for (var i = 0; i < 5; i++) {
 			Bubble.item.spawnBubble(this, this._bubbleSpawnX[this.game.rnd.integerInRange(0, 5)], this._currentExp, this._setup,null);
-			// create dragable sprite from the bubble
-			this._bubbleArray[i].events.onInputDown.add(this.mouseClick, this);
 		};
 
 		// add in-game menu panels

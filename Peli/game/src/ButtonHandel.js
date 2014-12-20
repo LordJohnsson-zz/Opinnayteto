@@ -69,13 +69,13 @@ var GameOverPanel = function(game, parent){
 	// Game over panel
 	this.panel = this.create(100, 100, 'gameOver');
 
-	this.btnReload = this.game.add.button(this.game._width/2-85, 205, 'button-reload', function(){
+	this.btnReload = this.game.add.button(this.game._width/2-95, 205, 'button-reload', function(){
 		buttonSoundClick.play();
 		this.game.state.start("Game");
 	}, this,0,0,1);
 	this.add(this.btnReload);
 
-	this.btnMainMenu = this.game.add.button(this.game._width/2, 205, 'button-toMainMenu', function(){
+	this.btnMainMenu = this.game.add.button(this.game._width/2-5, 205, 'button-toMainMenu', function(){
 		buttonSoundClick.play();
 		this.game.state.start("MainMenu");
 	}, this, 0,0,1);
@@ -102,15 +102,15 @@ var GameWonPanel = function(game, parent){
 	var buttonSoundClick = game.add.audio('buttonClick');
 	
 	// Game won panel
-	this.panel = this.create(100, 100, 'gameOver');
+	this.panel = this.create(100, 100, 'gameWon');
 	
-	this.btnReload = this.game.add.button(this.game._width/2-85, 205, 'button-reload', function(){
+	this.btnReload = this.game.add.button(this.game._width/2-95, 205, 'button-reload', function(){
 		buttonSoundClick.play();
 		this.game.state.start("Game");
 	}, this,0,0,1);
 	this.add(this.btnReload);
 
-	this.btnMainMenu = this.game.add.button(this.game._width/2, 205, 'button-toMainMenu', function(){
+	this.btnMainMenu = this.game.add.button(this.game._width/2-5, 205, 'button-toMainMenu', function(){
 		buttonSoundClick.play();
 		this.game.state.start("MainMenu");
 	}, this, 0,0,1);
