@@ -435,8 +435,9 @@ Bubble.Game.prototype = {
 			this._successArray.push(this._txtExpression.text);
 			this._expSolved = true;
 			// create sprite to show during correct answer
-			this._correct = this.add.sprite(Bubble.GAME_WIDTH/2-64,Bubble.GAME_HEIGHT/2-64,'correct');
-			this._correct.animations.add('showCorrect', [0,1,2,3,4,5,6,7], 15, false);
+			this._correct = this.add.sprite(Bubble.GAME_WIDTH/2-96,Bubble.GAME_HEIGHT/2-228,'correct');
+			this._correct.scale.set(1.5);
+			this._correct.animations.add('showCorrect', [0,1,2,3,4,5,6,7], 10, false);
 			this._correct.animations.play('showCorrect',null,false,true);
 			return true;
 		}
@@ -449,8 +450,9 @@ Bubble.Game.prototype = {
 			// show taken life as transparent to player
 			this._villeArray[this._playerHp].alpha -= 0.5;
 			// create sprite to show during incorrect answer
-			this._incorrect = this.add.sprite(Bubble.GAME_WIDTH/2-64,Bubble.GAME_HEIGHT/2-64,'incorrect');
-			this._incorrect.animations.add('showIncorrect', [0,1,2,3,4,5,6,7], 15, false);
+			this._incorrect = this.add.sprite(Bubble.GAME_WIDTH/2-96,Bubble.GAME_HEIGHT/2-228,'incorrect');
+			this._incorrect.scale.set(1.5);
+			this._incorrect.animations.add('showIncorrect', [0,1,2,3,4,5,6,7], 10, false);
 			this._incorrect.animations.play('showIncorrect',null,false,true);
 
 			return false;
@@ -468,6 +470,7 @@ Bubble.Game.prototype = {
 		this.btnPause.visible = false;
 		this.btnSetup.visible = false;
 		this._txtExpression.visible = false;
+		this._currentExp = null;
 		// show game over panel
 		this.endPanel.show();
 		// hide all bubbles
@@ -492,6 +495,7 @@ Bubble.Game.prototype = {
 		this.btnPause.visible = false;
 		this.btnSetup.visible = false;
 		this._txtExpression.visible = false;
+		this._currentExp = null;
 		// show game over panel
 		this.winPanel.show();
 		// hide all bubbles

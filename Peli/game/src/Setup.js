@@ -5,7 +5,7 @@ var Setup = {
     	var operator = null;
     	object = new Object();
     	// bubble dropping time in seconds
-		object.dropTime = 2;
+		object.dropTime = 5;
 		// operator used when joining bubbles: 'addition','subtraction','multiply','divide'
 		object.joinOperator = "addition";
 		object.playerHP = 5;

@@ -21,7 +21,7 @@ Bubble.Preload.prototype = {
         this.load.image('gameWon','assets/gameWonFlag.png');
         this.load.image('settings', 'assets/settings_panel.png');
         this.load.image('FloorBox', 'assets/BG_FloorBox.png');
-        this.load.image('pauseMenu', 'assets/pauseMenu.png');
+        this.load.image('pauseMenu', 'assets/gamePauseFlag.png');
         this.load.image('scoreStar', 'assets/scoreStar.png');
         this.load.image('plus','assets/operatorPlus.png');
         this.load.image('minus','assets/operatorMinus.png');

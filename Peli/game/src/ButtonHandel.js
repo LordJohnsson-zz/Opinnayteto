@@ -3,13 +3,11 @@
 // In-game pause -menu
 var PausePanel = function(game, parent){
 	Phaser.Group.call(this,game,parent);
-	var panelX = (Bubble.GAME_WIDTH/2)-147;
 	var buttonSoundClick = game.add.audio('buttonClick');
 	var showSetup = false;
 	
 	// create in-game menu board
-	this.panel = this.create(panelX, 50, 'pauseMenu');
-	this.panel.anchor.setTo(0.5, 0);
+	this.panel = this.create(100, 100, 'pauseMenu');
 
 	/*// restart game -button
 	this.btnReload = this.game.add.button(panelX-45, 120, 'button-reload', function(){
@@ -20,12 +18,12 @@ var PausePanel = function(game, parent){
 
 	// back to main menu -button 
 	this.btnMainMenu = this.game.add.button(panelX+60, 120, 'button-toMainMenu', function(){
-		buttonSoundClick.play();
+		buttonSoundClick.play();d
 		this.game.state.start("MainMenu");
 	}, this, 0,0,1);
 	this.add(this.btnMainMenu);*/
 
-	this.x = panelX;
+	this.x = 0;
 	this.y = -300;
 
 };
@@ -37,7 +35,7 @@ PausePanel.prototype.show = function(){
 	this.game.add.tween(this).to({y:0}, 500, Phaser.Easing.Bounce.Out, true);
 };
 PausePanel.prototype.hide = function(){
-	this.game.add.tween(this).to({y:-300}, 200, Phaser.Easing.Linear.NONE, true);
+	this.game.add.tween(this).to({y:-400}, 200, Phaser.Easing.Linear.NONE, true);
 };
 
 // In-game game over -menu
