@@ -17,11 +17,16 @@ Bubble.Preload.prototype = {
         this.load.image('BG5', 'assets/BG_5.png');
         this.load.image('BG6', 'assets/BG_6.png');
         this.load.image('background_menu', 'assets/BG_START.png');
-        this.load.image('gameOver', 'assets/peliloppui.png');
-        this.load.image('gameWon','assets/voitit.png');
+        this.load.image('gameOver', 'assets/gameOverFlag.png');
+        this.load.image('gameWon','assets/gameWonFlag.png');
         this.load.image('settings', 'assets/settings_panel.png');
         this.load.image('FloorBox', 'assets/BG_FloorBox.png');
         this.load.image('pauseMenu', 'assets/pauseMenu.png');
+        this.load.image('scoreStar', 'assets/scoreStar.png');
+        this.load.image('plus','assets/operatorPlus.png');
+        this.load.image('minus','assets/operatorMinus.png');
+        this.load.image('multy','assets/operatorMulty.png');
+        this.load.image('divide','assets/operatorDivide.png');
         // load spritesheets
         this.load.spritesheet('bubblesBlue', 'assets/Bubbles.png', 100, 100);
         this.load.spritesheet('createBlue', 'assets/createBlue.png', 100, 100);
@@ -43,6 +48,8 @@ Bubble.Preload.prototype = {
         this.load.spritesheet('button-soundOff','assets/settings_musicOff.png', 85, 85);
         this.load.spritesheet('ville_hp','assets/ville_robot_hp.png', 32, 60);
         this.load.spritesheet('score_star','assets/star.png', 44, 44);
+        this.load.spritesheet('correct','assets/correct.png',128,128);
+        this.load.spritesheet('incorrect','assets/incorrect.png',128,128);
         // load audio
         this.load.audio('bubble_appear', 'assets/audio/bubble2.mp3');
         this.load.audio('buttonClick', 'assets/audio/button-click.mp3');

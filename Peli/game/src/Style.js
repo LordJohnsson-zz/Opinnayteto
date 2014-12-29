@@ -9,7 +9,7 @@ function SetFontStyleNormal(){
 		fill: "#FFFFFF", 
 		stroke: "#333", 
 		strokeThickness: 5, 
-		align: "center" 
+		align: "center"
 	};
 
 	return normal;

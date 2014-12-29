@@ -5,11 +5,14 @@ var Setup = {
     	var operator = null;
     	object = new Object();
     	// bubble dropping time in seconds
-		object.dropTime = 5;
+		object.dropTime = 2;
 		// operator used when joining bubbles: 'addition','subtraction','multiply','divide'
 		object.joinOperator = "addition";
 		object.playerHP = 5;
     	object.arrayOfExpressions = new Array();
+    	// indicates what is hidde in expression; 1 = one of the operands, 2 = answer, 3 = randomly one of the previous
+    	object.hideNumber = 1;
+    	object.allowNegatives = false;
     	// create random expressions for the object
         for (var i = 0; i < 10; i++) {
         	// create expression object 

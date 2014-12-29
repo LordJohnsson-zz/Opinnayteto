@@ -5,35 +5,13 @@ var PausePanel = function(game, parent){
 	Phaser.Group.call(this,game,parent);
 	var panelX = (Bubble.GAME_WIDTH/2)-147;
 	var buttonSoundClick = game.add.audio('buttonClick');
+	var showSetup = false;
 	
 	// create in-game menu board
 	this.panel = this.create(panelX, 50, 'pauseMenu');
 	this.panel.anchor.setTo(0.5, 0);
-	
-	// create settings menu
-	this.settings = new SettingsPanel(game,(this.panel.y+this.panel.height-3));
-	game.add.existing(this.settings);
-	this.settings.visible = false;
-	this.settings.btnSounds.visible = false;
 
-	this.btnSetup = this.game.add.button(panelX-150, 120, 'button-setup', function(){
-		// add sound effect to onClick
-		buttonSoundClick.play();
-		// show settings menu
-		if (!this.settings.visible){
-			this.settings.visible = true;
-			this.settings.btnSounds.visible = true;
-		}
-		else{
-			this.settings.visible = false;
-			this.settings.btnSounds.visible = false;
-
-		}
-	}, this,0,0,1)
-	// add button to in-game menu
-	this.add(this.btnSetup);
-
-	// restart game -button
+	/*// restart game -button
 	this.btnReload = this.game.add.button(panelX-45, 120, 'button-reload', function(){
 		buttonSoundClick.play();
 		this.game.state.start("Game");
@@ -45,7 +23,7 @@ var PausePanel = function(game, parent){
 		buttonSoundClick.play();
 		this.game.state.start("MainMenu");
 	}, this, 0,0,1);
-	this.add(this.btnMainMenu);
+	this.add(this.btnMainMenu);*/
 
 	this.x = panelX;
 	this.y = -300;
@@ -69,7 +47,7 @@ var GameOverPanel = function(game, parent){
 	// Game over panel
 	this.panel = this.create(100, 100, 'gameOver');
 
-	this.btnReload = this.game.add.button(this.game._width/2-95, 205, 'button-reload', function(){
+	/*this.btnReload = this.game.add.button(this.game._width/2-95, 205, 'button-reload', function(){
 		buttonSoundClick.play();
 		this.game.state.start("Game");
 	}, this,0,0,1);
@@ -79,7 +57,7 @@ var GameOverPanel = function(game, parent){
 		buttonSoundClick.play();
 		this.game.state.start("MainMenu");
 	}, this, 0,0,1);
-	this.add(this.btnMainMenu);
+	this.add(this.btnMainMenu);*/
 
 	this.x = 0;
 	this.y = -300;
@@ -104,7 +82,7 @@ var GameWonPanel = function(game, parent){
 	// Game won panel
 	this.panel = this.create(100, 100, 'gameWon');
 	
-	this.btnReload = this.game.add.button(this.game._width/2-95, 205, 'button-reload', function(){
+	/*this.btnReload = this.game.add.button(this.game._width/2-95, 205, 'button-reload', function(){
 		buttonSoundClick.play();
 		this.game.state.start("Game");
 	}, this,0,0,1);
@@ -114,7 +92,7 @@ var GameWonPanel = function(game, parent){
 		buttonSoundClick.play();
 		this.game.state.start("MainMenu");
 	}, this, 0,0,1);
-	this.add(this.btnMainMenu);
+	this.add(this.btnMainMenu);*/
 
 	this.x = 0;
 	this.y = -300;
@@ -132,19 +110,45 @@ GameWonPanel.prototype.hide = function(){
 };
 
 // In-game winning menu
-var SettingsPanel = function(game,panelY, parent){
+var SettingsPanel = function(game, gameMusic,parent){
 	Phaser.Group.call(this,game,parent);
 	var buttonSoundClick = game.add.audio('buttonClick');
-	var infoFont = SetFontStyleExpression();
-	this.infoText = game.add.text(game.world.centerX-200, game.world.centerY-50, "TestiäTestiä", infoFont);
-	this.infoText.visible = false;
-	// Game won panel
-	this.panel = this.create((Bubble.GAME_WIDTH/2)-145, panelY, 'settings');
+	
+	// old values (Bubble.GAME_WIDTH/2)-145,
+	this.panel = this.create(0, 400, 'settings');
 
-	this.btnSounds = game.add.sprite(this.panel.x, this.panel.y+15, 'button-soundOn', 0);
-	this.btnSounds.inputEnabled = true;
-	this.btnSounds.events.onInputDown.add(this.musicSet, this);
-	this.btnInfo = this.game.add.button(this.panel.x, this.btnSounds.y+85, 'button-info', function(){
+	// sound settings button
+	this.btnSoundOn = this.game.add.button(this.panel.x, this.panel.y+15, 'button-soundOn', function(){
+		game.sound.mute = true;
+		this.btnSoundOff.visible=true;
+		this.btnSoundOn.visible=false;
+	}, this,0,0,0);
+	this.add(this.btnSoundOn);
+	this.btnSoundOff = this.game.add.button(this.panel.x, this.panel.y+15, 'button-soundOff', function(){
+		game.sound.mute = false;
+		this.btnSoundOff.visible=false;
+		this.btnSoundOn.visible=true;
+	}, this,0,0,0);
+	this.add(this.btnSoundOff);
+
+	if (this.game.sound.mute){
+		this.btnSoundOff.visible=true;
+		this.btnSoundOn.visible=false;
+	}
+	else{
+		this.btnSoundOff.visible=false;
+		this.btnSoundOn.visible=true;
+	}
+
+	// information text button
+	var infoFont = SetFontStyleNormal();
+	var itxt = "Tämä on info teksti joka näkyy kaikille niille jotka ovat klikanneet infotekstin auki ja tämä on pelkkää höpinää jota voi jatkaa niin pitkään kuin haluaa"
+	this.infoText = game.add.text(0, game.world.centerY-50, itxt, infoFont);
+	this.infoText.wordWrap = true;
+	this.infoText.wordWrapWidth = 590;
+	this.infoText.visible = false;
+	
+	this.btnInfo = this.game.add.button(this.panel.x, this.btnSoundOn.y+85, 'button-info', function(){
 		buttonSoundClick.play();
 		if (!this.infoText.visible) {
 			this.infoText.visible = true;
@@ -154,17 +158,17 @@ var SettingsPanel = function(game,panelY, parent){
 		}
 	}, this,0,0,0);
 	this.add(this.btnInfo);
+
+	this.x = -200;
+	this.y = 0;
 };
 
 SettingsPanel.prototype = Object.create(Phaser.Group.prototype);
 SettingsPanel.constructor = SettingsPanel;
 
-SettingsPanel.prototype.musicSet = function(game){
-	if (true) {};
-	if (this.btnSounds.key=="button-soundOn"){
-		this.btnSounds.loadTexture("button-soundOff");
-	}
-	else{
-		this.btnSounds.loadTexture("button-soundOn");
-	}
+SettingsPanel.prototype.show = function(){
+	this.game.add.tween(this).to({x:0}, 500, Phaser.Easing.Bounce.Out, true);
+};
+SettingsPanel.prototype.hide = function(){
+	this.game.add.tween(this).to({x:-200}, 200, Phaser.Easing.Linear.NONE, true);
 };
