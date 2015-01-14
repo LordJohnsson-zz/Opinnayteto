@@ -88,7 +88,7 @@ Bubble.Game.prototype = {
 
 		// spawn first 5 bubbles with spawn call
 		for (var i = 0; i < 5; i++) {
-			Bubble.item.spawnBubble(this, this._bubbleSpawnX[this.game.rnd.integerInRange(0, 5)], this._currentExp, this._setup,false);
+			Bubble.item.spawnBubble(this, this._bubbleSpawnX[i], this._currentExp, this._setup,false);
 		};
 
 		// add in-game menu panels
@@ -190,8 +190,7 @@ Bubble.Game.prototype = {
 					else{
 						// reset it
 						this._spawnBubbleTimer = 0;
-						// play spawning for bubble
-						//this.createBubbles(this);
+						// spawn bubble
 						Bubble.item.spawnBubble(this, this._bubbleSpawnX[this.game.rnd.integerInRange(0, 5)], this._currentExp, this._setup,false);
 					}
 				}
@@ -199,8 +198,6 @@ Bubble.Game.prototype = {
 				for (var i = 0; i < this._bubbleArray.length; i++) {
 						// create dragable sprite from the bubble
 						this._bubbleArray[i].events.onInputDown.add(this.mouseClick, this);
-						// check that bubble is inside game
-						//this._bubbleArray[i].events.onOutOfBounds.add(this.gameOver, this);
 				}
 				if (this._createBubble!=null) {
 					if (!this._createBubble.alive) {
@@ -214,7 +211,7 @@ Bubble.Game.prototype = {
 				if (this._expSolved) {
 					this._expressionTimer += this.time.elapsed;
 					// show the right answer for certain amount of time
-					if (this._expressionTimer>5000) {
+					if (this._expressionTimer>2500) {
 						// create a new expression
 						this.newExpression();
 						// print out the expression
@@ -342,14 +339,6 @@ Bubble.Game.prototype = {
 				}
 			}
 		}
-	},
-	// create new bubble to the world
-	createBubbles: function(game){
-		// play spwaning animation at the beginning of the bubble creation
-		this._createBubbleX = this._bubbleSpawnX[game.rnd.integerInRange(0, 5)];
-		this._createBubble = this.add.sprite(this._createBubbleX, 0, this._createBubbleColor);
-		this._createBubble.animations.add('create');
-		this._createBubble.animations.play('create',5,false,true);
 	},
 	// print out the current expression to be solved
 	showExpression: function(sObject, hiddenNumber, game){
@@ -540,8 +529,8 @@ Bubble.Game.prototype = {
 				// do not allow splitting 0
 				if (parseInt(bubble.bubbleText.text)>0) {
 					// spawn the splitted bubbles
-					Bubble.item.spawnBubble(this, this._bubbleSpawnX[this.game.rnd.integerInRange(0, 2)], this._currentExp, this._setup, true, bubble.bubbleText.text);
-					Bubble.item.spawnBubble(this, this._bubbleSpawnX[this.game.rnd.integerInRange(2, 5)],this._currentExp, this._setup, true, bubble.bubbleText.text);
+					Bubble.item.spawnBubble(this, this._bubbleSpawnX[0], this._currentExp, this._setup, true, bubble.bubbleText.text);
+					Bubble.item.spawnBubble(this, this._bubbleSpawnX[5],this._currentExp, this._setup, true, bubble.bubbleText.text);
 					var index = this._bubbleArray.indexOf(bubble);
 					this._bubbleArray.splice(index, 1);
 					this._tempBubble.tempText.destroy();

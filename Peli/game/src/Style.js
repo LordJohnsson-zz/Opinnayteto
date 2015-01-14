@@ -42,7 +42,7 @@ function SetFontStyleExpression(){
 function SetFontStyleBubble(){
 	this.txtBub = {
 		font: "32px Arial",
-		fill: "#ffffff", 
+		fill: "#000000", 
 		align: "center" 
 	};
 
