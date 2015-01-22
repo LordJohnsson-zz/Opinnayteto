@@ -47,6 +47,7 @@ Bubble.Game.prototype = {
 		// add score image & initialize the score text
 		this.add.sprite(0, 0, 'scoreStar');
 		Bubble._scoreText = this.add.text(84, 29.5, "0", this._fontStyle)
+		Bubble._winScore = this._setup.arrayOfExpressions.length;
 		// initialize game sound
 		this._appearSound = this.game.add.audio('bubble_appear');
 		this._buttonSoundClick = this.game.add.audio('buttonClick');
@@ -166,6 +167,7 @@ Bubble.Game.prototype = {
 		this._correct = null;
 		// define Bubble variables to reuse them in Bubble.item functions
 		Bubble._scoreText = null;
+		Bubble._winScore = 0;
 		Bubble._score = 0;
 	},
 	update: function(){
@@ -199,25 +201,22 @@ Bubble.Game.prototype = {
 						// create dragable sprite from the bubble
 						this._bubbleArray[i].events.onInputDown.add(this.mouseClick, this);
 				}
-				if (this._createBubble!=null) {
-					if (!this._createBubble.alive) {
-						this._createBubble.destroy();
-						// call the spawner for bubbles
-						Bubble.item.spawnBubble(this, this._createBubbleX, this._currentExp, this._setup,false);
-						this._createBubble = null;
-					}
-				}
 				// expression is solved
 				if (this._expSolved) {
-					this._expressionTimer += this.time.elapsed;
-					// show the right answer for certain amount of time
-					if (this._expressionTimer>2500) {
-						// create a new expression
-						this.newExpression();
-						// print out the expression
-						this.showExpression(this._currentExp, this._setup.hideNumber, this);
-						// reset timer
-						this._expressionTimer = 0;
+					if ((Bubble._winScore =! 0) && Bubble._score == Bubble._winScore) {
+						this.gameWon();
+					}
+					else{
+						this._expressionTimer += this.time.elapsed;
+						// show the right answer for certain amount of time
+						if (this._expressionTimer>2500) {
+							// create a new expression
+							this.newExpression();
+							// print out the expression
+							this.showExpression(this._currentExp, this._setup.hideNumber, this);
+							// reset timer
+							this._expressionTimer = 0;
+						}
 					}
 				};
 			}
@@ -395,15 +394,7 @@ Bubble.Game.prototype = {
 		// create new expression
 		var index = this._setup.arrayOfExpressions.indexOf(this._currentExp);
 		this._setup.arrayOfExpressions.splice(index, 1);
-		if (this._setup.arrayOfExpressions.length<1) {
-			if (Bubble._score==10) {
-				this.gameWon();
-			}
-			else{
-				this.gameOver();
-			}
-		}
-		else{
+		if (this._setup.arrayOfExpressions.length!=0) {
 			this._txtExpression.destroy();
 			this._currentExp = null;
 			this._currentExp = this._setup.arrayOfExpressions[this.rnd.integerInRange(0, this._setup.arrayOfExpressions.length-1)];
@@ -471,6 +462,9 @@ Bubble.Game.prototype = {
 		};
 		// stop ville's idle-animation
 		this._ville.animations.stop();
+		//finally set everything to default
+		this._bubbleArray = 0;
+		this._tempBubble = null;
 	},
 	// to win game
 	gameWon: function(){
@@ -496,6 +490,9 @@ Bubble.Game.prototype = {
 		};
 		// stop ville's idle-animation
 		this._ville.animations.stop();
+		//finally set everything to default
+		this._bubbleArray = 0;
+		this._tempBubble = null;
 	},
 	// thinkgs to do when bubble is clicked with mouse
 	mouseClick: function(bubble){

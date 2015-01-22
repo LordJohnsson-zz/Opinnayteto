@@ -140,7 +140,7 @@ var SettingsPanel = function(game, gameMusic,parent){
 
 	// information text button
 	var infoFont = SetFontStyleNormal();
-	var itxt = "Tämä on info teksti joka näkyy kaikille niille jotka ovat klikanneet infotekstin auki ja tämä on pelkkää höpinää jota voi jatkaa niin pitkään kuin haluaa"
+	var itxt = "Laske laskulaatikossa esitetty tehtävä pallojen numeroiden avulla. Voit yhdistellä ja jakaa palloja, mikäli et löydä vastausta täsmäävää lukua. Yhdistämisessä käytettävän operaattorin näet ruudun ylälaidasta. Hauskaa laskentaa!"
 	this.infoText = game.add.text(0, game.world.centerY-50, itxt, infoFont);
 	this.infoText.wordWrap = true;
 	this.infoText.wordWrapWidth = 590;
