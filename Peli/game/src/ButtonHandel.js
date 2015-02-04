@@ -139,11 +139,11 @@ var SettingsPanel = function(game, gameMusic,parent){
 	}
 
 	// information text button
-	var infoFont = SetFontStyleNormal();
+	var infoFont = SetFontStyleInfo();
 	var itxt = "Laske laskulaatikossa esitetty tehtävä pallojen numeroiden avulla. Voit yhdistellä ja jakaa palloja, mikäli et löydä vastausta täsmäävää lukua. Yhdistämisessä käytettävän operaattorin näet ruudun ylälaidasta. Hauskaa laskentaa!"
-	this.infoText = game.add.text(0, game.world.centerY-50, itxt, infoFont);
+	this.infoText = game.add.text(100, game.world.centerY+50, itxt, infoFont);
 	this.infoText.wordWrap = true;
-	this.infoText.wordWrapWidth = 590;
+	this.infoText.wordWrapWidth = 500;
 	this.infoText.visible = false;
 	
 	this.btnInfo = this.game.add.button(this.panel.x, this.btnSoundOn.y+85, 'button-info', function(){

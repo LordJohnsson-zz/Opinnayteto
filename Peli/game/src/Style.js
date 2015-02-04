@@ -15,6 +15,18 @@ function SetFontStyleNormal(){
 	return normal;
 }
 
+function SetFontStyleInfo(){
+	this.normal = { 
+		font: "30px Arial", 
+		fill: "#FFFFFF", 
+		stroke: "#333", 
+		strokeThickness: 5, 
+		align: "justify"
+	};
+
+	return normal;
+}
+
 function SetFontStyleLarge(){
 	this.large = {
 		font: "160px Arial",

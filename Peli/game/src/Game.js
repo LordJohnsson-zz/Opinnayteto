@@ -124,6 +124,7 @@ Bubble.Game.prototype = {
 			else{
 				this.settings.hide();
 				this._showSetup = false;
+				this.settings.infoText.visible = false;
 
 			}
 		}, this,0,0,1)
@@ -171,76 +172,83 @@ Bubble.Game.prototype = {
 		Bubble._score = 0;
 	},
 	update: function(){
+		
 		// check that game is not paused
 		if (!this._paused){
 
 			// update timer every frame
 			this._spawnBubbleTimer += this.time.elapsed;
-			// function for game start counter
-			this.startCounter(this);
-			// main game function
-			if (!this._start){
-
-				if (this._bubbleArray.length >= 5) {};
-
-				// if spawn timer reach time given from setup (1 sec = 1000 milliseconds)
-				if(this._spawnBubbleTimer > (this._setup.dropTime*1000)) {
-					// if game screen has reached it's limits
-					if (this._bubbleArray.length > 36) {
-						this.gameOver();
-					}
-					else{
-						// reset it
-						this._spawnBubbleTimer = 0;
-						// spawn bubble
-						Bubble.item.spawnBubble(this, this._bubbleSpawnX[this.game.rnd.integerInRange(0, 5)], this._currentExp, this._setup,false);
-					}
-				}
-				// add events to bubble
-				for (var i = 0; i < this._bubbleArray.length; i++) {
-						// create dragable sprite from the bubble
-						this._bubbleArray[i].events.onInputDown.add(this.mouseClick, this);
-				}
-				// expression is solved
-				if (this._expSolved) {
-					if ((Bubble._winScore =! 0) && Bubble._score == Bubble._winScore) {
-						this.gameWon();
-					}
-					else{
-						this._expressionTimer += this.time.elapsed;
-						// show the right answer for certain amount of time
-						if (this._expressionTimer>2500) {
-							// create a new expression
-							this.newExpression();
-							// print out the expression
-							this.showExpression(this._currentExp, this._setup.hideNumber, this);
-							// reset timer
-							this._expressionTimer = 0;
-						}
-					}
-				};
-			}
-			// add event to bubble text
-			for (var i = 0; i < this._bubbleArray.length; i++) {
-					// move text according to bubble positions
-					this._bubbleArray[i].bubbleText.x = Math.floor(this._bubbleArray[i].x);
-					this._bubbleArray[i].bubbleText.y = Math.floor(this._bubbleArray[i].y);
-			}
-			if (this._tempBubble!=null) {
-				this._tempBubble.tempText.x = Math.floor(this._tempBubble.x);
-				this._tempBubble.tempText.y = Math.floor(this._tempBubble.y);
-			}
-
+			
 			// check the player health
 			if (this._playerHp< 0) {
 				this.gameOver();
 			}
-			// floating number over bubble
-			if (this._tempCalculationText!="") {
+			else{
+				if (this._start) {
+					// function for game start counter
+					this.startCounter(this);
+				}
+				// main game function
+				else{
+					// if spawn timer reach time given from setup (1 sec = 1000 milliseconds)
+					if(this._spawnBubbleTimer > (this._setup.dropTime*1000)) {
+						// if game screen has reached it's limits
+						if (this._bubbleArray.length > 36) {
+							this.gameOver();
+						}
+						else{
+							// reset it
+							this._spawnBubbleTimer = 0;
+							// spawn bubble
+							Bubble.item.spawnBubble(this, this._bubbleSpawnX[this.game.rnd.integerInRange(0, 5)], this._currentExp, this._setup,false);
+						}
+					}
+					// add events to bubble
+					for (var i = 0; i < this._bubbleArray.length; i++) {
+							// create dragable sprite from the bubble
+							this._bubbleArray[i].events.onInputDown.add(this.mouseClick, this);
+					}
+					// expression is solved
+					if (this._expSolved) {
+						if (Bubble._winScore =! 0) {
+							if (Bubble._score == Bubble._winScore) {
+								this.gameWon();
+							}
+						}
+						else{
+							this._expressionTimer += this.time.elapsed;
+							// show the right answer for certain amount of time
+							if (this._expressionTimer>2500) {
+								// create a new expression
+								this.newExpression();
+								// print out the expression
+								this.showExpression(this._currentExp, this._setup.hideNumber, this);
+								// reset timer
+								this._expressionTimer = 0;
+							}
+						}
+					};
+				}
 
-				// make it rise and fade
-				this._tempCalculationText.y -= 2;
-				this._tempCalculationText.alpha -= 0.005;
+				// add event to bubble text
+				for (var i = 0; i < this._bubbleArray.length; i++) {
+						// move text according to bubble positions
+						this._bubbleArray[i].bubbleText.x = Math.floor(this._bubbleArray[i].x);
+						this._bubbleArray[i].bubbleText.y = Math.floor(this._bubbleArray[i].y);
+				}
+
+				if (this._tempBubble!=null) {
+					this._tempBubble.tempText.x = Math.floor(this._tempBubble.x);
+					this._tempBubble.tempText.y = Math.floor(this._tempBubble.y);
+				}
+
+				// floating number over bubble
+				if (this._tempCalculationText!="") {
+
+					// make it rise and fade
+					this._tempCalculationText.y -= 2;
+					this._tempCalculationText.alpha -= 0.005;
+				}
 			}
 		}
 	},
@@ -307,37 +315,36 @@ Bubble.Game.prototype = {
 	// start game counter
 	startCounter: function(game){
 
-		if (game._start) {
-			var startFont = SetFontStyleLarge();
+		var startFont = SetFontStyleLarge();
 
-			// if spawn timer reach one second (1000 milliseconds)
-			if(game._spawnBubbleTimer > 1000) {
-				// clear text
-				if (game._counterText != ""){ 
-					// erase the counter text
-					game._counterText.destroy();
-				};
-				// reset timer
-				game._spawnBubbleTimer = 0;
-				// print counter text
-				if (game._counter == 0) {
-				 	game._counterText = game.add.text(game.world.centerX-200, game.world.centerY-50, "Anna mennä!", startFont);
-				 	game._counterText.fontSize = 75;
-				}
-				if(game._counter > 0){
-					// play counter sound 
-					this._counterSound.play();
-					game._counterText = game.add.text(game.world.centerX-50, game.world.centerY-50, game._counter, startFont);
-				}
-				// decrease counter number 
-				game._counter -= 1;
-				if (game._counter < -1){
-					// set counter to false
-					game._start = false;
-					game._counterText.destroy();
-				}
+		// if spawn timer reach one second (1000 milliseconds)
+		if(game._spawnBubbleTimer > 1000) {
+			// clear text
+			if (game._counterText != ""){ 
+				// erase the counter text
+				game._counterText.destroy();
+			};
+			// reset timer
+			game._spawnBubbleTimer = 0;
+			// print counter text
+			if (game._counter == 0) {
+			 	game._counterText = game.add.text(game.world.centerX-200, game.world.centerY-50, "Anna mennä!", startFont);
+			 	game._counterText.fontSize = 75;
+			}
+			if(game._counter > 0){
+				// play counter sound 
+				this._counterSound.play();
+				game._counterText = game.add.text(game.world.centerX-50, game.world.centerY-50, game._counter, startFont);
+			}
+			// decrease counter number 
+			game._counter -= 1;
+			if (game._counter < -1){
+				// set counter to false
+				game._start = false;
+				game._counterText.destroy();
 			}
 		}
+		
 	},
 	// print out the current expression to be solved
 	showExpression: function(sObject, hiddenNumber, game){
@@ -423,17 +430,20 @@ Bubble.Game.prototype = {
 		}
 		// answer incorrect: play sound
 		else{
-			// play sound
-			this._wrongAnswer.play();
 			// take life away from the player
 			this._playerHp -= 1;
-			// show taken life as transparent to player
-			this._villeArray[this._playerHp].alpha -= 0.5;
-			// create sprite to show during incorrect answer
-			this._incorrect = this.add.sprite(Bubble.GAME_WIDTH/2-96,Bubble.GAME_HEIGHT/2-228,'incorrect');
-			this._incorrect.scale.set(1.5);
-			this._incorrect.animations.add('showIncorrect', [0,1,2,3,4,5,6,7], 10, false);
-			this._incorrect.animations.play('showIncorrect',null,false,true);
+			// prevent errors from negative number
+			if (this._playerHp>=0) {
+				// play wrong answer sound
+				this._wrongAnswer.play();
+				// show taken life as transparent to player
+				this._villeArray[this._playerHp].alpha -= 0.5;
+				// create sprite to show during incorrect answer
+				this._incorrect = this.add.sprite(Bubble.GAME_WIDTH/2-96,Bubble.GAME_HEIGHT/2-228,'incorrect');
+				this._incorrect.scale.set(1.5);
+				this._incorrect.animations.add('showIncorrect', [0,1,2,3,4,5,6,7], 10, false);
+				this._incorrect.animations.play('showIncorrect',null,false,true);
+			};
 
 			return false;
 		}
@@ -464,7 +474,7 @@ Bubble.Game.prototype = {
 		this._ville.animations.stop();
 		//finally set everything to default
 		this._bubbleArray = 0;
-		this._tempBubble = null;
+		this._tempBubble.destroy();
 	},
 	// to win game
 	gameWon: function(){
@@ -492,7 +502,7 @@ Bubble.Game.prototype = {
 		this._ville.animations.stop();
 		//finally set everything to default
 		this._bubbleArray = 0;
-		this._tempBubble = null;
+		this._tempBubble.destroy();
 	},
 	// thinkgs to do when bubble is clicked with mouse
 	mouseClick: function(bubble){
@@ -546,7 +556,7 @@ Bubble.Game.prototype = {
 		var overlapBubbleIndex;
 		this._tempBubble.events.onDragStop.add(function(){
 			// when giving an answer
-			if (this._tempBubble.overlap(this._floor)) {
+			if (this._tempBubble.overlap(this._txtExpression)) {
 				// able to give answers only when expression is not solved
 				if (!this._expSolved) {
 					// if the answer is true
