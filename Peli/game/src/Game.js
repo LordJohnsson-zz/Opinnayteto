@@ -210,22 +210,18 @@ Bubble.Game.prototype = {
 					}
 					// expression is solved
 					if (this._expSolved) {
-						if (Bubble._winScore =! 0) {
-							if (Bubble._score == Bubble._winScore) {
-								this.gameWon();
-							}
+						if (Bubble._score == Bubble._winScore) {
+							this.gameWon();
 						}
-						else{
-							this._expressionTimer += this.time.elapsed;
-							// show the right answer for certain amount of time
-							if (this._expressionTimer>2500) {
-								// create a new expression
-								this.newExpression();
-								// print out the expression
-								this.showExpression(this._currentExp, this._setup.hideNumber, this);
-								// reset timer
-								this._expressionTimer = 0;
-							}
+						this._expressionTimer += this.time.elapsed;
+						// show the right answer for certain amount of time
+						if (this._expressionTimer>2500) {
+							// create a new expression
+							this.newExpression();
+							// print out the expression
+							this.showExpression(this._currentExp, this._setup.hideNumber, this);
+							// reset timer
+							this._expressionTimer = 0;
 						}
 					};
 				}
